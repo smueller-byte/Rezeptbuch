@@ -1,0 +1,3703 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Rezeptbuch">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='%23ffffff'/><g fill='none' stroke='%238a6d3b' stroke-width='9' stroke-linecap='round' stroke-linejoin='round' transform='translate(30 30) scale(5)'><path d='M5 10a7 7 0 0 1 14 0'/><line x1='3' y1='10.5' x2='21' y2='10.5'/><path d='M6 13.5h12l-1 4.5a2 2 0 0 1-2 1.6H9a2 2 0 0 1-2-1.6z'/><line x1='12' y1='3' x2='12' y2='4.6'/></g></svg>">
+<title>Unser Rezeptbuch</title>
+<style id="pageStyle">@page{size:210mm 297mm;margin:0}</style>
+<style>
+:root{
+  --ink:#1f1d1a; --ink-soft:#66605a; --ink-faint:#9c948a;
+  --rule:#d5cec4; --rule-soft:#e8e4dd; --paper:#fff;
+  --bg:#f6f4f0; --accent:#8a6d3b; --accent-soft:#f0ead9;
+  --danger:#a4442f;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+
+/* ---------- Kopfleiste ---------- */
+.topbar{position:sticky;top:0;z-index:40;background:var(--paper);border-bottom:1px solid var(--rule)}
+.topbar-in{max-width:1180px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.brand{font-family:var(--serif);font-size:20px;letter-spacing:.01em;margin-right:auto}
+.brand small{display:block;font-family:var(--sans);font-size:10px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--ink-faint);margin-top:3px}
+nav{display:flex;gap:2px;flex-wrap:wrap}
+nav button{background:none;border:0;padding:8px 14px;border-radius:999px;color:var(--ink-soft);
+  font-size:13.5px;letter-spacing:.01em}
+nav button:hover{background:var(--bg)}
+nav button.on{background:var(--accent-soft);color:var(--accent)}
+
+/* ---------- Grundelemente ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:26px 20px 80px}
+h2.section{font-family:var(--serif);font-weight:400;font-size:24px;margin:0 0 4px}
+.sub{color:var(--ink-faint);font-size:13px;margin-bottom:22px}
+
+.btn{background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:8px 14px;
+  font-size:13.5px;color:var(--ink)}
+.btn:hover{border-color:var(--ink-faint)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#755c31}
+.btn.ghost{background:none;border-color:transparent;color:var(--ink-soft)}
+.btn.ghost:hover{background:var(--paper);border-color:var(--rule)}
+.btn.danger{color:var(--danger);border-color:#e6d2cc}
+.btn.sm{padding:5px 10px;font-size:12.5px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spacer{flex:1}
+
+.field{display:block;margin-bottom:14px}
+.field > span{display:block;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:5px}
+input[type=text],input[type=number],select,textarea{width:100%;background:var(--paper);
+  border:1px solid var(--rule);border-radius:8px;padding:9px 11px;font-size:14px}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent)}
+textarea{resize:vertical;min-height:80px;line-height:1.5}
+
+.card{background:var(--paper);border:1px solid var(--rule);border-radius:12px}
+.pad{padding:18px 20px}
+
+.chip{background:var(--paper);border:1px solid var(--rule);border-radius:999px;padding:6px 13px;
+  font-size:12.5px;color:var(--ink-soft)}
+.chip.on{background:var(--accent-soft);border-color:#e0d3b4;color:var(--accent)}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+
+.empty{text-align:center;color:var(--ink-faint);padding:60px 20px;font-size:14px}
+.empty p{margin:0 0 16px}
+
+/* ---------- Startseite ---------- */
+.hero{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.hero h2{font-family:var(--serif);font-weight:400;font-size:27px;margin:0;line-height:1}
+.hero .count{font-size:12.5px;color:var(--ink-faint);margin-bottom:2px}
+.hero .sp{flex:1}
+.search{position:relative;margin-bottom:20px}
+.search input{width:100%;padding:14px 16px 14px 44px;border-radius:12px;font-size:15px;
+  border:1px solid var(--rule);background:var(--paper)}
+.search svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);
+  width:17px;height:17px;stroke:var(--ink-faint);fill:none;stroke-width:1.7}
+.tabs{display:flex;gap:22px;flex-wrap:wrap;align-items:center;
+  border-bottom:1px solid var(--rule-soft);padding-bottom:1px}
+.tabs button{background:none;border:0;padding:9px 0;font-size:14px;color:var(--ink-soft);
+  border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button:hover{color:var(--ink)}
+.tabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
+.tabs .sp{flex:1}
+.tabs .more{font-size:12.5px;color:var(--ink-faint)}
+.filters{margin:16px 0 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;
+  margin-top:22px}
+.rcard{background:var(--paper);border:1px solid transparent;border-radius:14px;
+  padding:24px 18px 20px;text-align:center;cursor:pointer;position:relative;
+  box-shadow:0 1px 2px rgba(31,29,26,.05);transition:box-shadow .15s, transform .15s}
+.rcard:hover{box-shadow:0 6px 20px rgba(31,29,26,.10);transform:translateY(-2px)}
+.rcard .ico{width:26px;height:26px;margin:0 auto 12px;display:block;opacity:.85}
+.rcard .kind{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-faint);
+  margin-bottom:8px}
+.rcard h3{font-family:var(--serif);font-weight:400;font-size:17.5px;margin:0;line-height:1.24}
+.rcard .ft{margin-top:14px;font-size:11.5px;color:var(--ink-faint)}
+.rcard .last{margin-top:6px;font-size:10.5px;color:var(--ink-faint);opacity:.8}
+.rcard .sel{position:absolute;top:12px;left:12px;width:18px;height:18px;accent-color:var(--accent)}
+.rcard.picked{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+
+/* ---------- Vorratssuche ---------- */
+.pantry-box{background:var(--paper);border:1px solid var(--rule);border-radius:12px;
+  padding:18px 20px;margin-bottom:20px}
+.pantry-in{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.pantry-in input{flex:1;min-width:180px}
+.pantry-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px}
+.pantry-chips .chip{background:var(--accent-soft);border-color:#e0d3b4;color:var(--accent)}
+.pantry-chips .chip b{font-weight:400;margin-left:7px;opacity:.65}
+.hit{background:var(--paper);border:1px solid var(--rule);border-radius:12px;
+  padding:16px 18px;margin-bottom:11px;display:flex;gap:16px;align-items:flex-start}
+.hit .ic{flex:none;margin-top:2px}
+.hit .mid{flex:1;min-width:0}
+.hit h3{font-family:var(--serif);font-weight:400;font-size:18px;margin:0 0 5px}
+.hit .sc{font-size:12.5px;color:var(--ink-soft);margin-bottom:5px}
+.hit .miss{font-size:12.5px;color:var(--ink-faint)}
+.hit .miss b{font-weight:400;color:var(--danger)}
+.hit .acts{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+.bar{height:5px;border-radius:3px;background:var(--rule-soft);overflow:hidden;
+  margin:7px 0 9px;max-width:220px}
+.bar i{display:block;height:100%;background:var(--accent)}
+
+/* ---------- Backup einspielen ---------- */
+.imp-box{border:1px solid var(--rule-soft);border-radius:10px;padding:13px 15px;
+  margin-bottom:12px}
+.imp-box h4{margin:0 0 8px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-soft);font-weight:500}
+.imp-box.neu h4{color:var(--accent)}
+.imp-box ul{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:1.65}
+.imp-box li{color:var(--ink-soft)}
+.imp-box.dop li{text-decoration:line-through;color:var(--ink-faint)}
+.imp-box .mehr{font-size:12.5px;color:var(--ink-faint);margin-top:5px}
+.imp-meta{font-size:12.5px;color:var(--ink-faint);margin:0 0 16px}
+
+/* ---------- Zuordnen beim Import ---------- */
+.asg-head{position:sticky;top:0;background:var(--paper);z-index:2;padding-bottom:12px;
+  border-bottom:1px solid var(--rule-soft);margin-bottom:6px}
+.asg-sum{font-size:12.5px;color:var(--ink-soft);margin-top:9px}
+.asg-sum b{font-weight:400;color:var(--accent)}
+.asg-row{display:flex;gap:12px;align-items:flex-start;padding:7px 0;
+  border-bottom:1px solid var(--rule-soft)}
+.asg-roles{display:flex;flex:none;border:1px solid var(--rule);border-radius:8px;
+  overflow:hidden}
+.asg-roles button{background:var(--paper);border:0;border-right:1px solid var(--rule);
+  padding:6px 9px;font-size:11px;color:var(--ink-faint);min-width:34px}
+.asg-roles button:last-child{border-right:0}
+.asg-roles button.on{background:var(--accent);color:#fff}
+.asg-txt{flex:1;font-size:14px;line-height:1.4;padding-top:5px;word-break:break-word}
+.asg-row.x .asg-txt{color:var(--ink-faint);text-decoration:line-through}
+.asg-row.t .asg-txt{font-family:var(--serif);font-size:18px}
+.asg-from{flex:none;padding-top:5px}
+.asg-from button{background:none;border:0;color:var(--ink-faint);font-size:11px;
+  padding:4px 6px;white-space:nowrap}
+.asg-from button:hover{color:var(--accent)}
+
+/* ---------- Modal ---------- */
+.overlay{position:fixed;inset:0;background:rgba(35,32,28,.45);z-index:60;display:flex;
+  align-items:flex-start;justify-content:center;padding:28px 16px;overflow:auto}
+.modal{background:var(--paper);border-radius:14px;width:100%;max-width:860px;position:relative}
+.modal.narrow{max-width:560px}
+.modal-head{display:flex;align-items:center;gap:14px;padding:18px 22px;border-bottom:1px solid var(--rule)}
+.modal-head h3{font-family:var(--serif);font-weight:400;font-size:20px;margin:0;flex:1}
+.modal-body{padding:22px}
+.modal-foot{display:flex;gap:10px;padding:16px 22px;border-top:1px solid var(--rule);
+  background:#fbfaf8;border-radius:0 0 14px 14px}
+
+/* ---------- Zutaten-Editor ---------- */
+.ing-row{display:grid;grid-template-columns:78px 92px 1fr 34px;gap:8px;margin-bottom:7px}
+.step-row{display:grid;grid-template-columns:24px 1fr 34px;gap:8px;margin-bottom:8px;align-items:start}
+.step-row .no{font-size:12px;color:var(--accent);padding-top:11px;text-align:center}
+.icon-btn{background:none;border:0;color:var(--ink-faint);font-size:17px;line-height:1;padding:8px}
+.icon-btn:hover{color:var(--danger)}
+
+.nutri-preview{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule-soft);
+  border:1px solid var(--rule-soft);border-radius:8px;overflow:hidden;margin-top:6px}
+.nutri-preview div{background:var(--paper);padding:11px 8px;text-align:center}
+.nutri-preview b{display:block;font-size:16px;font-weight:400;font-family:var(--serif)}
+.nutri-preview span{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+.hint{font-size:12px;color:var(--ink-faint);margin:6px 0 0;line-height:1.45}
+.warn{background:#fdf6ec;border:1px solid #ecd9b6;border-radius:8px;padding:10px 12px;
+  font-size:12.5px;color:#7a5c22;margin-top:10px}
+
+/* ---------- Wochenplan ---------- */
+.plan{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.day{background:var(--paper);border:1px solid var(--rule);border-radius:10px;padding:12px 11px}
+.day h4{margin:0 0 3px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+.day .pers{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--ink-faint);
+  margin-bottom:11px}
+.day .pers input{width:44px;padding:3px 5px;font-size:12px;text-align:center;border-radius:6px}
+.slot{margin-bottom:9px}
+.slot .sl{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);
+  margin-bottom:3px}
+.slot select{padding:6px 7px;font-size:12.5px;border-radius:7px}
+@media(max-width:900px){.plan{grid-template-columns:repeat(2,1fr)}}
+
+/* ---------- Einkaufsliste ---------- */
+.shop-group{margin-bottom:24px}
+.shop-group h4{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);
+  margin:0 0 8px;padding-bottom:6px;border-bottom:1px solid var(--rule)}
+.shop-item{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px dotted var(--rule-soft)}
+.shop-item input{margin-top:2px}
+.shop-item .q{width:88px;flex:none;color:var(--ink-soft);font-size:13.5px}
+.shop-item .n{flex:1}
+.shop-item.done .n,.shop-item.done .q{color:var(--ink-faint);text-decoration:line-through}
+.shop-item .from{font-size:11px;color:var(--ink-faint)}
+
+/* ---------- Rezeptansicht am Bildschirm ---------- */
+.rv-head{text-align:center;padding:6px 0 20px;border-bottom:1px solid var(--rule-soft);
+  margin-bottom:20px}
+.rv-head .ico{display:block;margin:0 auto 10px}
+.rv-kind{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-faint);
+  margin-bottom:8px}
+.rv-head h2{font-family:var(--serif);font-weight:400;font-size:29px;line-height:1.14;margin:0 0 10px}
+.rv-tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.rv-tags span{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);background:var(--bg);border-radius:999px;padding:4px 11px}
+.rv-meta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:22px}
+.rv-meta div{flex:1;min-width:88px;text-align:center;background:var(--bg);border-radius:10px;
+  padding:11px 8px}
+.rv-meta dt{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);
+  margin:0 0 4px}
+.rv-meta dd{margin:0;font-size:14.5px}
+.rv-cols{display:flex;gap:30px;align-items:flex-start}
+.rv-ing{width:250px;flex:none}
+.rv-steps{flex:1}
+.rv-h{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);
+  margin:0 0 12px;padding-bottom:7px;border-bottom:1px solid var(--rule-soft)}
+.rv-ing ul{list-style:none;margin:0;padding:0}
+.rv-ing li{display:flex;gap:10px;padding:7px 0;border-bottom:1px dotted var(--rule-soft);
+  font-size:14.5px}
+.rv-ing li:last-child{border-bottom:0}
+.rv-ing .a{width:74px;flex:none;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.rv-steps ol{list-style:none;margin:0;padding:0;counter-reset:rs}
+.rv-steps li{counter-increment:rs;position:relative;padding-left:34px;margin-bottom:16px;
+  font-size:15px;line-height:1.55}
+.rv-steps li::before{content:counter(rs);position:absolute;left:0;top:1px;width:23px;height:23px;
+  border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:11.5px;
+  display:flex;align-items:center;justify-content:center}
+.rv-tip{margin-top:18px;padding:13px 15px;background:var(--bg);border-radius:10px;
+  font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ink-soft);line-height:1.5}
+.rv-nutri{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule-soft);
+  border:1px solid var(--rule-soft);border-radius:10px;overflow:hidden;margin:24px 0 0}
+.rv-nutri div{background:var(--paper);padding:13px 8px;text-align:center}
+.rv-nutri b{display:block;font-family:var(--serif);font-size:19px;font-weight:400}
+.rv-nutri span{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+.rv-actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center;
+  padding-bottom:18px;margin-bottom:4px}
+.rv-log{margin-top:26px;padding-top:18px;border-top:1px solid var(--rule-soft)}
+.rv-log .e{display:flex;gap:12px;font-size:13.5px;padding:7px 0;color:var(--ink-soft);
+  border-bottom:1px dotted var(--rule-soft)}
+.rv-log .e b{font-weight:400;color:var(--ink);min-width:86px}
+.rv-log .e .ea{display:flex;gap:2px;opacity:.45;transition:opacity .12s}
+.rv-log .e:hover .ea{opacity:1}
+.rv-log .e .icon-btn{padding:2px 6px;font-size:14px}
+@media(hover:none){ .rv-log .e .ea{opacity:1} }
+.btn.big{padding:12px 20px;font-size:15px;border-radius:10px}
+
+/* ---------- Kochmodus ---------- */
+#cookRoot{position:fixed;inset:0;z-index:120;background:var(--paper);display:none;
+  flex-direction:column;overscroll-behavior:contain}
+#cookRoot.on{display:flex}
+.ck-top{display:flex;align-items:center;gap:14px;padding:14px 20px;
+  border-bottom:1px solid var(--rule-soft);flex:none}
+.ck-top .t{flex:1;font-family:var(--serif);font-size:17px;line-height:1.2;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ck-top .x{background:none;border:0;font-size:15px;color:var(--ink-soft);padding:6px 4px}
+.ck-bar{height:3px;background:var(--rule-soft);flex:none}
+.ck-bar i{display:block;height:100%;background:var(--accent);transition:width .25s ease}
+.ck-body{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;
+  padding:34px 24px 24px;display:flex;justify-content:center}
+.ck-inner{width:100%;max-width:660px}
+.ck-label{font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-faint);
+  text-align:center;margin-bottom:20px}
+.ck-inner h3{font-family:var(--serif);font-weight:400;font-size:26px;text-align:center;
+  margin:0 0 26px;line-height:1.2}
+.ck-step{font-family:var(--serif);font-size:25px;line-height:1.48;margin:0}
+.ck-hint{margin-top:26px;padding-top:16px;border-top:1px solid var(--rule-soft);
+  font-size:13.5px;color:var(--ink-soft)}
+.ck-hint .l{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);
+  display:block;margin-bottom:7px}
+.ck-hint .i{display:inline-block;background:var(--bg);border-radius:999px;padding:5px 12px;
+  margin:0 6px 6px 0;font-size:13.5px}
+.ck-check{list-style:none;margin:0;padding:0}
+.ck-check li{border-bottom:1px solid var(--rule-soft)}
+.ck-check label{display:flex;gap:14px;align-items:center;padding:14px 4px;cursor:pointer;
+  font-size:17px}
+.ck-check input{width:22px;height:22px;flex:none;accent-color:var(--accent)}
+.ck-check .a{width:96px;flex:none;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.ck-check li.done label{color:var(--ink-faint)}
+.ck-check li.done .n{text-decoration:line-through}
+.ck-foot{flex:none;display:flex;gap:12px;align-items:center;padding:16px 20px;
+  padding-bottom:calc(16px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--rule-soft);background:var(--paper)}
+.ck-foot .btn{flex:1;padding:16px;font-size:16px;border-radius:12px}
+.ck-foot .btn.primary{flex:2}
+.ck-timer{display:inline-flex;align-items:center;gap:9px;background:var(--accent-soft);
+  color:var(--accent);border:0;border-radius:999px;padding:9px 16px;font-size:14px;
+  margin-top:18px}
+.ck-timer.run{background:var(--accent);color:#fff}
+.ck-done{text-align:center;padding:20px 0}
+.ck-done .big{font-family:var(--serif);font-size:30px;margin:18px 0 10px}
+@media(max-width:760px){
+  .rv-cols{flex-direction:column;gap:24px}
+  .rv-ing{width:100%}
+  .rv-head h2{font-size:24px}
+  .rv-meta div{min-width:70px;padding:9px 6px}
+  .rv-meta dd{font-size:13.5px}
+  .rv-actions{position:sticky;top:56px;background:var(--paper);z-index:3;padding-top:8px}
+  .rv-actions .btn{flex:1}
+  .ck-body{padding:26px 18px 18px}
+  .ck-step{font-size:22px}
+  .ck-inner h3{font-size:22px}
+}
+
+/* ---------- Export ---------- */
+.opt{display:flex;gap:9px;align-items:flex-start;padding:9px 0}
+.opt label{font-size:14px}
+.opt .d{font-size:12px;color:var(--ink-faint);margin-top:2px}
+
+/* ================= DRUCKLAYOUT (A5-Buchseiten) ================= */
+#printRoot{display:none}
+.sheet{position:relative;width:148mm;height:210mm;background:#fff;overflow:hidden;
+  display:flex;flex-direction:column;font-family:var(--serif);color:var(--ink)}
+.sheet.front{padding:11mm 12mm 12mm 18mm}
+.sheet.back{padding:11mm 18mm 12mm 12mm}
+.sheet .head{text-align:center;flex:none}
+.sheet .bicon{display:block;margin:0 auto 2mm}
+.sheet .kind{font-family:var(--sans);font-size:6.2pt;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:3.5mm}
+.sheet h1{font-family:var(--serif);font-size:22pt;font-weight:400;line-height:1.12;margin:0 0 2.5mm}
+.sheet .tags{font-family:var(--sans);font-size:6.6pt;letter-spacing:.16em;color:var(--ink-soft);
+  text-transform:uppercase}
+.sheet .tags .sep{color:var(--rule);margin:0 1.4mm}
+.sheet hr.rule{border:0;border-top:.4pt solid var(--rule);margin:4.5mm 0;flex:none}
+.sheet .meta{display:flex;justify-content:space-between;text-align:center;font-family:var(--sans);
+  margin-bottom:5.5mm;flex:none}
+.sheet .meta > div{flex:1}
+.sheet .meta dt{font-size:5.7pt;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);
+  margin:0 0 1.4mm}
+.sheet .meta dd{font-size:8pt;margin:0}
+.sheet h2{font-family:var(--sans);font-size:6.4pt;font-weight:500;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--ink-soft);margin:0 0 3mm;padding-bottom:1.5mm;
+  border-bottom:.4pt solid var(--rule-soft)}
+.sheet .body-grid{display:flex;gap:7mm;flex:1 1 auto;min-height:0}
+.sheet .col-left{width:47mm;flex:none;display:flex;flex-direction:column}
+.sheet .col-right{flex:1}
+.sheet .ingredients{list-style:none;margin:0;padding:0;font-size:8.8pt}
+/* Lange Listen brauchen weniger Luft, sonst passt die Seite nicht */
+.sheet .col-left.dense .ingredients{font-size:7.6pt}
+.sheet .col-left.dense .ingredients li{padding:.6mm 0;line-height:1.25}
+.sheet .col-right.dense .steps{font-size:7.9pt}
+.sheet .col-right.dense .steps li{margin-bottom:1.9mm;line-height:1.34}
+.sheet .col-right.dense .tip{font-size:7pt;margin-top:2.5mm;padding-top:2mm}
+.sheet .ingredients li{display:flex;gap:2mm;line-height:1.34;padding:1mm 0;
+  border-bottom:.3pt dotted var(--rule-soft)}
+.sheet .ingredients li:last-child{border-bottom:0}
+.sheet .amount{width:16mm;flex:none;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.sheet .steps{margin:0;padding:0;list-style:none;counter-reset:s;font-size:8.8pt}
+.sheet .steps li{counter-increment:s;position:relative;padding-left:6mm;margin-bottom:2.6mm;
+  line-height:1.42}
+.sheet .steps li::before{content:counter(s);position:absolute;left:0;top:.4mm;
+  font-family:var(--sans);font-size:6.6pt;color:var(--accent)}
+.sheet .tip{margin:3.5mm 0 0;padding-top:2.5mm;border-top:.4pt solid var(--rule-soft);
+  font-size:7.6pt;font-style:italic;color:var(--ink-soft);line-height:1.4}
+.sheet .nutri{flex:none;margin-top:auto;font-family:var(--sans);border:.4pt solid var(--rule);
+  padding:3mm 3.5mm 2.5mm}
+.sheet .nutri-label{font-size:5.5pt;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-faint);text-align:center;padding-bottom:2mm;margin-bottom:1mm;
+  border-bottom:.3pt solid var(--rule-soft)}
+.sheet .nutri-row{display:flex;justify-content:space-between;align-items:baseline;padding:1.1mm 0;
+  border-bottom:.3pt dotted var(--rule-soft)}
+.sheet .nutri-row:last-child{border-bottom:0;padding-bottom:0}
+.sheet .nutri-key{font-size:6pt;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.sheet .nutri-val{font-size:8.6pt;font-variant-numeric:tabular-nums}
+.sheet .note-head{display:flex;align-items:baseline;justify-content:space-between;
+  border-bottom:.4pt solid var(--rule);padding-bottom:2.5mm;margin-bottom:7mm;flex:none}
+.sheet .note-head .t{font-family:var(--sans);font-size:6.4pt;font-weight:500;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--ink-soft)}
+.sheet .note-head .r{font-size:9.5pt;font-style:italic;color:var(--ink-soft)}
+.sheet .from{display:flex;align-items:baseline;gap:2mm;flex:none;margin-bottom:7mm}
+.sheet .from .lbl{font-family:var(--sans);font-size:6.2pt;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink-faint);white-space:nowrap}
+.sheet .from .fill{flex:1;border-bottom:.3pt solid var(--rule-soft);height:6mm}
+.sheet table.cooked{width:100%;border-collapse:collapse;margin-bottom:9mm;flex:none}
+.sheet table.cooked th{font-family:var(--sans);font-size:5.7pt;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-faint);font-weight:400;text-align:left;
+  padding:0 1.5mm 1.5mm;border-bottom:.4pt solid var(--rule)}
+.sheet table.cooked td{height:8.5mm;border-bottom:.3pt solid var(--rule-soft);padding:0 1.5mm}
+.sheet table.cooked .c-date{width:20mm}
+.sheet table.cooked .c-guest{width:14mm}
+.sheet table.cooked .c-rate{width:24mm;text-align:center}
+.sheet table.cooked td.c-rate{color:var(--rule);font-size:7.5pt;letter-spacing:.35mm;white-space:nowrap}
+.sheet .lines div{height:8.2mm;border-bottom:.3pt solid var(--rule-soft)}
+.sheet.cover,.sheet.divider{justify-content:center;align-items:center;text-align:center}
+.sheet.cover h1{font-size:30pt;margin-bottom:4mm}
+.sheet.cover .frame{border:.5pt solid var(--rule);padding:18mm 10mm;width:100%}
+.sheet .dash{width:18mm;border-top:.5pt solid var(--accent);margin:7mm auto}
+.sheet.cover .sub{font-family:var(--sans);font-size:7pt;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--ink-faint)}
+.sheet.divider h1{font-size:26pt;margin:6mm 0 0}
+.sheet.divider .dash{width:22mm;margin:6mm auto 0}
+.sheet .tab{position:absolute;right:0;width:9mm;height:40mm;border:.4pt solid var(--rule);
+  border-right:0;background:#fff}
+.sheet .tab span{position:absolute;left:50%;top:50%;width:40mm;margin-left:-20mm;margin-top:-2mm;
+  transform:rotate(90deg);text-align:center;font-family:var(--sans);font-size:6.4pt;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft)}
+/* Einkaufsliste im Druck */
+.sheet.list{padding:14mm}
+.sheet.list h1{font-size:18pt;text-align:center;margin-bottom:2mm}
+.sheet.list .when{font-family:var(--sans);font-size:6.4pt;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-faint);text-align:center;margin-bottom:7mm}
+.sheet.list .g{font-family:var(--sans);font-size:6.2pt;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-soft);margin:5mm 0 2mm;padding-bottom:1.2mm;border-bottom:.4pt solid var(--rule)}
+.sheet.list .it{display:flex;gap:2mm;font-size:8.6pt;padding:1.2mm 0;
+  border-bottom:.3pt dotted var(--rule-soft)}
+.sheet.list .it .box{width:3mm;height:3mm;border:.4pt solid var(--rule);flex:none;margin-top:1mm}
+.sheet.list .it .q{width:20mm;flex:none;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+
+/* Blatt = physisches Papier. Die A5-Buchseite wird darin zentriert und
+   für A4 vergrößert, damit das Layout exakt gleich bleibt. */
+.paper{position:relative;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;background:#fff;flex:none}
+.paper.a4{width:210mm;height:297mm}
+/* zoom vergrößert das Layout selbst (nicht nur die Darstellung) – dadurch
+   druckt A4 exakt so wie die Vorschau. */
+.paper.a4 > .sheet{zoom:1.38}
+@supports not (zoom:1){
+  .paper.a4 > .sheet{zoom:normal;transform:scale(1.38);transform-origin:center center}
+}
+.paper.a5{width:148mm;height:210mm}
+
+/* Bildschirmvorschau der Buchseiten */
+.preview{background:#c9c5bf;padding:20px;border-radius:12px;display:flex;flex-wrap:wrap;gap:14px;
+  justify-content:center}
+.preview .paper{box-shadow:0 2px 14px rgba(0,0,0,.25)}
+.pv-scale{overflow:hidden;flex:none}
+.pv-scale > *{transform-origin:top left}
+.pv-a4{width:105mm;height:148.5mm}
+.pv-a4 > *{transform:scale(.5)}
+.pv-a5{width:111mm;height:157.5mm}
+.pv-a5 > *{transform:scale(.75)}
+
+@media print{
+  html,body{background:#fff;margin:0;padding:0}
+  .app,.topbar,.overlay,#toast{display:none !important}
+  #printRoot{display:block !important}
+  #printRoot .paper{page-break-after:always;break-after:page;box-shadow:none;margin:0}
+  #printRoot .paper:last-child{page-break-after:auto;break-after:auto}
+}
+
+/* ---------- Handy und Tablet ---------- */
+@media(max-width:760px){
+  body{font-size:15.5px}
+  .topbar-in{padding:11px 14px;gap:10px}
+  .brand{font-size:17px;margin-right:0;width:100%}
+  nav{width:100%;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;
+    padding-bottom:2px}
+  nav button{white-space:nowrap;padding:8px 12px}
+  .wrap{padding:18px 14px 90px}
+  h2.section{font-size:21px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:11px}
+  .rcard{padding:16px 12px}
+  .rcard h3{font-size:15.5px}
+  .toolbar input[type=text]{width:100%}
+  .toolbar .btn{flex:1}
+  .overlay{padding:0}
+  .modal{border-radius:0;max-width:none;min-height:100vh}
+  .modal-head{position:sticky;top:0;background:var(--paper);z-index:2}
+  .modal-foot{position:sticky;bottom:0}
+  .modal-body{padding:16px}
+  .ing-row{grid-template-columns:62px 84px 1fr 28px;gap:6px}
+  .ing-row input,.ing-row select{padding:8px 7px;font-size:13.5px}
+  .plan{grid-template-columns:1fr}
+  .preview{padding:10px}
+  .pv-a4,.pv-a5{width:78mm;height:110mm}
+  .pv-a4 > *{transform:scale(.371)}
+  .pv-a5 > *{transform:scale(.527)}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="topbar">
+    <div class="topbar-in">
+      <div class="brand" id="brandBox"></div>
+      <nav id="nav"></nav>
+    </div>
+  </header>
+  <main class="wrap" id="view"></main>
+</div>
+
+<div id="modalRoot"></div>
+<div id="cookRoot"></div>
+<div id="printRoot"></div>
+
+<script>
+/* =========================================================================
+   TEIL 1 — Stammdaten: Symbole, Kapitel, Einheiten, Nährwerttabelle, Beispiele
+   ========================================================================= */
+
+const ICONS = {
+  vorspeise:'<path d="M3.6 11h12.8a6.4 6.4 0 0 1-6.4 6.4h0A6.4 6.4 0 0 1 3.6 11z"/><line x1="2.4" y1="11" x2="17.6" y2="11"/><line x1="6" y1="19.6" x2="14" y2="19.6"/><ellipse cx="20" cy="6.6" rx="1.8" ry="2.6"/><line x1="20" y1="9.2" x2="20" y2="19.6"/>',
+  hauptspeise:'<circle cx="12" cy="12" r="6.6"/><circle cx="12" cy="12" r="4"/><path d="M2.8 3.2v3.1a1.5 1.5 0 0 0 3 0V3.2"/><line x1="4.3" y1="3.2" x2="4.3" y2="5.6"/><line x1="4.3" y1="7.8" x2="4.3" y2="20.8"/><path d="M20.8 3.2c-1.5 1.2-2.3 2.9-2.3 4.7v1.5h2.3z"/><line x1="20.8" y1="9.4" x2="20.8" y2="20.8"/>',
+  nachspeise:'<path d="M6.4 10h11.2l-1.4 6.6a2.6 2.6 0 0 1-2.5 2h-3.4a2.6 2.6 0 0 1-2.5-2z"/><line x1="12" y1="18.6" x2="12" y2="20.9"/><line x1="8.4" y1="20.9" x2="15.6" y2="20.9"/><path d="M7.4 10a4.6 4.6 0 0 1 9.2 0"/><line x1="12" y1="4.6" x2="12" y2="5.6"/><circle cx="12" cy="3.5" r="1.1"/>',
+  snack:'<path d="M4 11h16l-1.3 5.6a3 3 0 0 1-2.9 2.3H8.2a3 3 0 0 1-2.9-2.3z"/><line x1="2.6" y1="11" x2="21.4" y2="11"/><circle cx="9" cy="7.6" r="1.5"/><circle cx="13.4" cy="5.6" r="1.5"/><circle cx="15.8" cy="8.4" r="1.5"/>',
+  getraenk:'<path d="M6.6 4.5h10.8l-1.3 8.2a4.2 4.2 0 0 1-4.1 3.5h0a4.2 4.2 0 0 1-4.1-3.5z"/><line x1="12" y1="16.2" x2="12" y2="20.6"/><line x1="8.6" y1="20.6" x2="15.4" y2="20.6"/><line x1="7.4" y1="8.4" x2="16.6" y2="8.4"/>',
+  gewuerz:'<path d="M5.2 12.4h13.6a6.8 6.8 0 0 1-6.8 6.8h0a6.8 6.8 0 0 1-6.8-6.8z"/><line x1="3.8" y1="12.4" x2="20.2" y2="12.4"/><line x1="7.6" y1="20.8" x2="16.4" y2="20.8"/><line x1="16.4" y1="4.6" x2="10.4" y2="11"/><circle cx="17.6" cy="3.4" r="1.5"/>',
+  cloche:'<path d="M5 10a7 7 0 0 1 14 0"/><line x1="3" y1="10.5" x2="21" y2="10.5"/><path d="M6 13.5h12l-1 4.5a2 2 0 0 1-2 1.6H9a2 2 0 0 1-2-1.6z"/><line x1="12" y1="3" x2="12" y2="4.6"/>'
+};
+
+function icon(key, px, cls){
+  return '<svg class="'+(cls||'')+'" style="width:'+px+';height:'+px+'" viewBox="0 0 24 24" '+
+    'fill="none" stroke="#8a6d3b" stroke-width="1.5" stroke-linecap="round" '+
+    'stroke-linejoin="round">'+(ICONS[key]||ICONS.hauptspeise)+'</svg>';
+}
+
+/* Kapitel = Gang. Frei umbenennbar, Reihenfolge fest. */
+const CHAPTERS = [
+  {id:'vorspeise',   one:'Vorspeise',   many:'Vorspeisen'},
+  {id:'hauptspeise', one:'Hauptspeise', many:'Hauptspeisen'},
+  {id:'nachspeise',  one:'Nachspeise',  many:'Nachspeisen'},
+  {id:'snack',       one:'Snack',       many:'Snacks'},
+  {id:'getraenk',    one:'Getränk',     many:'Getränke & Cocktails'},
+  {id:'gewuerz',     one:'Gewürz',      many:'Gewürze & Grundlagen'}
+];
+const chapterOf = id => CHAPTERS.find(c=>c.id===id) || CHAPTERS[1];
+
+/* Vorschlaege fuer Tags — frei erweiterbar beim Tippen */
+const TAG_SUGGESTIONS = [
+  'Italienisch','Bayerisch','Französisch','Asiatisch','Orientalisch',
+  'Vegetarisch','Vegan','Glutenfrei','Laktosefrei',
+  'High Protein','Leichte Kost','Schnell'
+];
+const MAX_TAGS = 3;   /* mehr als drei machen Karte und Buchseite unruhig */
+
+/* Abteilungen fuer die Einkaufsliste, in Laufreihenfolge durch den Markt */
+const DEPTS = [
+  ['gem','Obst & Gemüse'], ['fle','Fleisch & Fisch'], ['kuh','Kühlregal'],
+  ['tro','Trockenwaren & Konserven'], ['bak','Backzutaten'], ['gew','Gewürze, Öl & Essig'],
+  ['get','Getränke'], ['son','Sonstiges']
+];
+
+/* Einheiten: Anzeige-Name + Standardgewicht in Gramm (null = zutatenabhaengig) */
+const UNITS = [
+  {u:'g',       g:1},        {u:'kg',      g:1000},
+  {u:'ml',      g:1},        {u:'l',       g:1000},
+  {u:'EL',      g:15},       {u:'TL',      g:5},
+  {u:'Msp.',    g:0.5},      {u:'Prise',   g:0.4},
+  {u:'Stück',   g:null},     {u:'Bund',    g:20},
+  {u:'Zehe',    g:4},        {u:'Scheibe', g:25},
+  {u:'Dose',    g:240},      {u:'Glas',    g:200},
+  {u:'Becher',  g:200},      {u:'Blatt',   g:1.7},
+  {u:'Kopf',    g:350},      {u:'Stange',  g:80},
+  {u:'Zweig',   g:3},        {u:'Päckchen',g:10},
+  {u:'Handvoll',g:30},
+  {u:'n. B.',   g:0}
+];
+const unitDef = u => UNITS.find(x=>x.u===u) || UNITS[0];
+
+/* Mehrzahl der Einheiten, damit „2 Zehen“ statt „2 Zehe“ auf dem Blatt steht */
+const PLURAL = {'Zehe':'Zehen','Scheibe':'Scheiben','Dose':'Dosen','Blatt':'Blätter',
+  'Stange':'Stangen','Bund':'Bünde','Prise':'Prisen','Glas':'Gläser','Kopf':'Köpfe',
+  'Zweig':'Zweige'};
+const unitLabel = (u,a) => (a>1 && PLURAL[u]) ? PLURAL[u] : u;
+
+/* -------------------------------------------------------------------------
+   Nährwerttabelle je 100 g: [Suchbegriff, kcal, Eiweiß, Fett, KH, Abteilung,
+   Gramm je Stück, Gramm je EL]
+   Bewusst als Schätzgrundlage gedacht — in der App jederzeit überschreibbar.
+   ------------------------------------------------------------------------- */
+const FOODS = [
+['tomatenmark',80,4,.5,13,'tro',null,16],
+['passierte tomate',35,1.5,.3,6,'tro',null,null],
+['tomate',18,.9,.2,3.9,'gem',100,null],
+['zwiebel',28,1.2,.3,4.9,'gem',80,null],
+['knoblauch',149,6.4,.5,28,'gem',4,null],
+['schalotte',30,1.3,.2,5,'gem',25,null],
+['karotte',41,.9,.2,6.9,'gem',80,null],
+['möhre',41,.9,.2,6.9,'gem',80,null],
+['paprika',31,1,.3,6,'gem',150,null],
+['brokkoli',34,2.8,.4,3,'gem',400,null],
+['blumenkohl',25,1.9,.3,3,'gem',600,null],
+['zucchini',19,1.2,.3,2.1,'gem',200,null],
+['aubergine',25,1,.2,3,'gem',250,null],
+['kartoffel',77,2,.1,17,'gem',120,null],
+['süßkartoffel',86,1.6,.1,20,'gem',200,null],
+['gurke',15,.7,.1,2,'gem',300,null],
+['salat',15,1.4,.2,1.5,'gem',300,null],
+['spinat',23,2.9,.4,1.4,'gem',null,null],
+['champignon',22,3.1,.3,.3,'gem',20,null],
+['pilz',22,3.1,.3,.3,'gem',20,null],
+['lauch',61,1.5,.3,6,'gem',150,null],
+['sellerie',16,.7,.2,3,'gem',null,null],
+['kürbis',26,1,.1,4.9,'gem',null,null],
+['erbse',81,5.4,.4,10,'gem',null,null],
+['bohne',31,1.8,.1,3,'gem',null,null],
+['mais',86,3.3,1.2,15,'tro',null,null],
+['ingwer',80,1.8,.8,13,'gem',30,null],
+['chili',40,1.9,.4,5,'gem',10,null],
+['zitrone',29,1.1,.3,3,'gem',80,null],
+['limette',30,.7,.2,8,'gem',60,null],
+['orange',47,.9,.1,9,'gem',180,null],
+['apfel',52,.3,.2,12,'gem',150,null],
+['banane',89,1.1,.3,20,'gem',120,null],
+['erdbeere',32,.7,.3,5.5,'gem',null,null],
+['himbeere',52,1.2,.7,6,'gem',null,null],
+['heidelbeere',57,.7,.3,10,'gem',null,null],
+['birne',57,.4,.1,12,'gem',160,null],
+['avocado',160,2,15,2,'gem',200,null],
+['petersilie',36,3,.8,2,'gem',null,null],
+['basilikum',23,3.2,.6,1,'gem',null,null],
+['schnittlauch',30,3,.7,1.8,'gem',null,null],
+['rosmarin',131,3.3,5.9,13,'gem',null,null],
+['thymian',101,5.6,1.7,10,'gem',null,null],
+['koriander',23,2.1,.5,.9,'gem',null,null],
+['dill',43,3.5,1.1,2.6,'gem',null,null],
+['minze',44,3.3,.7,5,'gem',null,null],
+
+['hähnchenbrust',110,23,1.2,0,'fle',150,null],
+['hähnchen',180,18,12,0,'fle',null,null],
+['putenbrust',105,24,1,0,'fle',150,null],
+['rinderhack',210,19,15,0,'fle',null,null],
+['hackfleisch',240,18,19,0,'fle',null,null],
+['rindfleisch',180,21,10,0,'fle',null,null],
+['schweinefilet',120,22,3,0,'fle',null,null],
+['schweinebraten',220,19,16,0,'fle',null,null],
+['speck',400,13,38,0,'fle',null,null],
+['bacon',400,13,38,0,'fle',null,null],
+['schinken',145,20,7,1,'fle',null,null],
+['salami',380,18,34,1,'fle',null,null],
+['wurst',300,13,27,1,'fle',null,null],
+['lachs',200,20,13,0,'fle',150,null],
+['kabeljau',82,18,.7,0,'fle',150,null],
+['thunfisch',110,24,1,0,'fle',null,null],
+['garnele',85,20,.5,0,'fle',null,null],
+['forelle',120,20,4,0,'fle',250,null],
+
+['vollmilch',64,3.4,3.6,4.8,'kuh',null,null],
+['milch',64,3.4,3.6,4.8,'kuh',null,null],
+['schlagsahne',300,2.4,30,3.2,'kuh',null,null],
+['sahne',300,2.4,30,3.2,'kuh',null,null],
+['crème fraîche',300,2.5,30,3,'kuh',null,null],
+['schmand',240,3,24,3,'kuh',null,null],
+['naturjoghurt',61,3.5,3.3,4.7,'kuh',null,null],
+['joghurt',61,3.5,3.3,4.7,'kuh',null,null],
+['quark',67,12,.2,4,'kuh',null,null],
+['frischkäse',250,6,24,3,'kuh',null,15],
+['butter',740,.7,82,.6,'kuh',null,12],
+['margarine',720,.2,80,.4,'kuh',null,12],
+['parmesan',400,33,28,0,'kuh',null,6],
+['mozzarella',250,18,19,1,'kuh',125,null],
+['gouda',350,25,27,0,'kuh',null,null],
+['feta',260,14,21,1,'kuh',null,null],
+['käse',350,25,27,0,'kuh',null,null],
+['eigelb',320,16,28,1,'kuh',18,null],
+['eiweiß',52,11,.2,.7,'kuh',33,null],
+['ei',140,12,10,1,'kuh',58,null],
+['tofu',120,13,7,1,'kuh',null,null],
+
+['spaghetti',350,12,1.5,70,'tro',null,null],
+['nudel',350,12,1.5,70,'tro',null,null],
+['pasta',350,12,1.5,70,'tro',null,null],
+['basmatireis',350,7,1,78,'tro',null,null],
+['reis',350,7,1,78,'tro',null,null],
+['couscous',360,12,1,72,'tro',null,null],
+['bulgur',340,12,1.5,69,'tro',null,null],
+['quinoa',370,14,6,58,'tro',null,null],
+['linse',340,24,1.5,50,'tro',null,null],
+['kichererbse',120,8,2.5,20,'tro',null,null],
+['kidneybohne',95,7,.5,13,'tro',null,null],
+['kokosmilch',190,2,19,3,'tro',null,null],
+['gemüsebrühe',5,.2,.2,.5,'tro',null,null],
+['brühe',5,.2,.2,.5,'tro',null,null],
+['semmelbrösel',380,12,2,72,'bak',null,10],
+['haferflocke',370,13,7,59,'bak',null,10],
+['mehl',350,10,1,72,'bak',null,10],
+['ciabatta',270,9,3,48,'bak',30,null],
+['baguette',270,9,2,50,'bak',30,null],
+['toast',270,8,3,48,'bak',25,null],
+['brot',250,8,1.5,48,'bak',40,null],
+['zucker',400,0,0,100,'bak',null,12],
+['honig',300,.3,0,82,'bak',null,20],
+['walnuss',650,15,62,7,'bak',null,10],
+['mandel',580,21,50,6,'bak',null,10],
+['cashew',550,18,44,27,'bak',null,10],
+['nuss',620,15,55,12,'bak',null,10],
+['sesam',570,17,50,12,'bak',null,9],
+['pinienkern',670,14,68,4,'bak',null,9],
+['rosine',300,3,.5,70,'bak',null,10],
+['backpulver',100,0,0,25,'bak',null,null],
+['gelatine',340,86,0,0,'bak',null,null],
+['hefe',105,12,2,12,'bak',null,null],
+['speisestärke',380,0,0,91,'bak',null,10],
+['vanille',288,4,12,13,'bak',3,null],
+['schokolade',540,6,31,58,'bak',null,null],
+['kakao',350,20,14,35,'bak',null,6],
+
+['olivenöl',880,0,100,0,'gew',null,12],
+['rapsöl',880,0,100,0,'gew',null,12],
+['sesamöl',880,0,100,0,'gew',null,12],
+['sonnenblumenöl',880,0,100,0,'gew',null,12],
+['öl',880,0,100,0,'gew',null,12],
+['balsamico',90,0,0,17,'gew',null,15],
+['essig',20,0,0,.5,'gew',null,15],
+['sojasauce',60,6,0,6,'gew',null,16],
+['senf',100,5,6,5,'gew',null,15],
+['mayonnaise',700,1,78,1,'gew',null,14],
+['ketchup',110,1,.2,25,'gew',null,17],
+['salz',0,0,0,0,'gew',null,18],
+['pfeffer',250,10,3,40,'gew',null,6],
+['paprikapulver',280,14,13,34,'gew',null,6],
+['currypulver',320,13,14,40,'gew',null,6],
+['curry',320,13,14,40,'gew',null,6],
+['kreuzkümmel',375,18,22,44,'gew',null,6],
+['zimt',250,4,1,28,'gew',null,6],
+['oregano',265,9,4,69,'gew',null,3],
+['chiliflocke',280,12,14,32,'gew',null,4],
+['cayenne',280,12,14,32,'gew',null,4],
+['muskat',525,6,36,49,'gew',null,6],
+
+['weißwein',80,0,0,2.5,'get',null,null],
+['rotwein',85,0,0,2.6,'get',null,null],
+['wein',82,0,0,2.5,'get',null,null],
+['sekt',80,0,0,3,'get',null,null],
+['bier',43,.5,0,3.6,'get',null,null],
+['orangensaft',45,.7,.2,10,'get',null,null],
+['saft',45,.5,0,11,'get',null,null],
+['wasser',0,0,0,0,'get',null,null],
+
+/* aus den eingelesenen Rezepten ergänzt */
+['salsiccia',300,15,26,1,'fle',null,null],
+['bratwurst',300,13,27,1,'fle',null,null],
+['rinder-patty',250,18,19,1,'fle',110,null],
+['patty',250,18,19,1,'fle',110,null],
+['patti',250,18,19,1,'fle',110,null],
+['gnocchi',170,4,1,35,'tro',null,null],
+['rigatoni',350,12,1.5,70,'tro',null,null],
+['tortilla',300,8,7,49,'bak',64,null],
+['wrap',300,8,7,49,'bak',64,null],
+['pizzateig',270,8,5,46,'kuh',400,null],
+['pecorino',390,26,32,0,'kuh',null,6],
+['cheddar',400,25,33,1,'kuh',null,null],
+['saure sahne',115,3,10,3,'kuh',null,null],
+['skyr',63,11,0.2,4,'kuh',null,null],
+['sojajoghurt',50,4,2,3,'kuh',null,null],
+['proteinpulver',380,80,4,6,'son',null,10],
+['erdnussbutter',600,25,50,12,'bak',null,16],
+['ahornsirup',260,0,0,67,'bak',null,20],
+['backkakao',350,20,14,35,'bak',null,6],
+['blaubeere',57,0.7,0.3,10,'gem',null,null],
+['kiwi',61,1.1,0.5,11,'gem',75,null],
+['mango',60,0.8,0.4,13,'gem',300,null],
+['ananas',50,0.5,0.1,12,'gem',null,null],
+['kokoswasser',20,0.2,0,4,'get',null,null],
+['essiggurke',15,0.6,0.2,2,'tro',30,null],
+['fenchelsamen',345,16,15,35,'gew',null,6],
+['whisky',250,0,0,0,'get',null,null],
+['sauerteig',180,6,1,36,'bak',null,null],
+['roggenmehl',330,9,1.7,66,'bak',null,10],
+['dinkelmehl',350,12,2,68,'bak',null,10],
+['granola',450,10,18,60,'bak',null,10],
+['kokosraspel',660,6,63,7,'bak',null,6],
+['chiasamen',490,17,31,8,'bak',null,10],
+['hanfsamen',550,32,49,4,'bak',null,10],
+['kürbiskern',560,30,46,5,'bak',null,10]
+];
+
+/* -------------------------------------------------------------------------
+   Beispielrezepte — beim ersten Start geladen, jederzeit löschbar
+   ------------------------------------------------------------------------- */
+const SEED = [
+{ chapter:'hauptspeise', title:'Bohnen-Thunfisch-Wrap',
+  tags:['Orientalisch','High Protein','Schnell'],
+  servings:1, servingsLabel:'Wrap',
+  prep:'15 Min', cookLabel:'Kochen', cook:'—', difficulty:'Leicht',
+  ingredients:[
+    {a:1,u:'Dose',n:'Kidneybohnen (abgetropft)'},
+    {a:1,u:'Dose',n:'Thunfisch (abgetropft)'},
+    {a:1,u:'Stück',n:'Tomate aus der Dose'},
+    {a:.5,u:'TL',n:'Kreuzkümmel'},
+    {a:1,u:'TL',n:'Paprikapulver'},
+    {a:.5,u:'TL',n:'Knoblauchpulver'},
+    {a:1,u:'Stück',n:'kleine rote Zwiebel'},
+    {a:1,u:'Stück',n:'Tomate'},
+    {a:null,u:'n. B.',n:'Petersilie oder Koriander'},
+    {a:null,u:'n. B.',n:'Limettensaft'},
+    {a:200,u:'ml',n:'Sojajoghurt'},
+    {a:1,u:'Zehe',n:'Knoblauch (gerieben)'},
+    {a:1,u:'TL',n:'Limettensaft für die Soße'},
+    {a:1,u:'Stück',n:'großer Wrap (Weizentortilla)'},
+    {a:null,u:'n. B.',n:'Romanasalat'},
+    {a:null,u:'n. B.',n:'Salz und Pfeffer'}],
+  steps:[
+    'Bohnen-Thunfisch-Masse: Kidneybohnen abspülen und abtropfen lassen. Mit der Dosentomate, dem abgetropften Thunfisch, Kreuzkümmel, Paprika- und Knoblauchpulver sowie Salz und Pfeffer in einer Schüssel grob zerdrücken und gut vermengen.',
+    'Salat: Tomate und Zwiebel fein würfeln, Petersilie oder Koriander hacken. Alles mit Limettensaft und etwas Salz vermischen.',
+    'Soße: Sojajoghurt mit geriebenem Knoblauch, Limettensaft, Salz und Pfeffer verrühren.',
+    'Wrap füllen: Bohnenmasse auf dem Wrap verteilen, Salat und einige Blätter Romanasalat daraufgeben, mit Joghurtsoße beträufeln. Einrollen und genießen.'],
+  tip:'Die Füllung reicht auch für zwei kleinere Wraps – dann etwa halbe Werte, plus rund 190 kcal je zusätzlichem Tortilla.',
+  nutriManual:{kcal:675, protein:55, fat:9, carbs:78} },
+
+{ chapter:'hauptspeise', title:'Gnocchi alla Salsiccia',
+  tags:['Italienisch','High Protein','Schnell'],
+  servings:2, servingsLabel:'Portionen',
+  prep:'10 Min', cookLabel:'Braten', cook:'15 Min', difficulty:'Mittel',
+  ingredients:[
+    {a:120,u:'g',n:'Salsiccia'},
+    {a:250,u:'g',n:'Gnocchi'},
+    {a:2,u:'Stück',n:'Eier (M)'},
+    {a:1,u:'Stück',n:'zusätzliches Eiweiß'},
+    {a:40,u:'g',n:'Pecorino (gerieben)'},
+    {a:40,u:'g',n:'saure Sahne'},
+    {a:100,u:'g',n:'TK-Erbsen'},
+    {a:1,u:'Stück',n:'kleine Zwiebel'},
+    {a:2,u:'Zehe',n:'Knoblauch'},
+    {a:1,u:'TL',n:'Olivenöl'},
+    {a:1,u:'TL',n:'Fenchelsamen'},
+    {a:null,u:'n. B.',n:'Salz und schwarzer Pfeffer'}],
+  steps:[
+    'Sauce anrühren: Eier, zusätzliches Eiweiß, saure Sahne und den geriebenen Pecorino glatt verrühren. Kräftig pfeffern, nur sparsam salzen – Salsiccia und Pecorino bringen bereits viel Salz mit.',
+    'Salsiccia anbraten: Die Salsiccia aus der Pelle drücken und im Olivenöl bei mittlerer bis hoher Hitze etwa fünf Minuten krümelig anbraten. Nicht zu früh rühren, damit sich Röstaromen bilden.',
+    'Aromen aufbauen: Zwiebel zugeben und zwei bis drei Minuten glasig dünsten. Knoblauch und Fenchelsamen kurz mitbraten, dann die Erbsen zugeben und zwei Minuten mitziehen lassen.',
+    'Gnocchi braten: Die Gnocchi ungekocht in die Pfanne geben, gut mit dem Bratfett vermengen und unter gelegentlichem Wenden sechs bis acht Minuten braten, bis sie außen goldbraun und innen weich sind. Bei Bedarf drei bis vier Esslöffel Wasser zugeben und mit Deckel kurz garziehen lassen.',
+    'Hitze abschalten: Die Pfanne vom Herd ziehen und eine Minute abkühlen lassen. Ist die Pfanne zu heiß, stockt das Ei und wird krümelig statt cremig.',
+    'Alles verbinden: Die Ei-Käse-Mischung angießen und zügig unterheben, bis eine glänzende Sauce entsteht, die an den Gnocchi haftet – etwa 30 bis 60 Sekunden.',
+    'Servieren: Sofort auf vorgewärmte Teller geben, mit dem restlichen Pecorino und frisch gemahlenem schwarzem Pfeffer toppen.'],
+  tip:'Für noch mehr Eiweiß die saure Sahne durch 60 g Magerquark ersetzen, mit etwas Wasser glattgerührt.',
+  nutriManual:{kcal:630, protein:32, fat:32, carbs:50} },
+
+{ chapter:'hauptspeise', title:'Pasta alla Norcina romana',
+  tags:['Italienisch','Klassiker'],
+  servings:4, servingsLabel:'Portionen',
+  prep:'10 Min', cookLabel:'Kochen', cook:'25 Min', difficulty:'Leicht',
+  ingredients:[
+    {a:400,u:'g',n:'Rigatoni'},
+    {a:300,u:'g',n:'Salsiccia'},
+    {a:2,u:'EL',n:'Olivenöl'},
+    {a:20,u:'g',n:'Butter'},
+    {a:60,u:'ml',n:'Whisky'},
+    {a:150,u:'ml',n:'Sahne (30 %)'},
+    {a:60,u:'g',n:'Pecorino Romano (gerieben)'},
+    {a:20,u:'g',n:'Pecorino zum Servieren'},
+    {a:1,u:'TL',n:'schwarzer Pfeffer'},
+    {a:1,u:'EL',n:'Salz fürs Nudelwasser'}],
+  steps:[
+    'Wasser aufsetzen: Reichlich Wasser in einem großen Topf aufsetzen und kräftig salzen. Erst zum Kochen bringen, wenn die Sauce beginnt – die Pasta soll frisch fertig werden.',
+    'Salsiccia anbraten: Die Salsiccia aus der Pelle drücken und in Olivenöl bei mittlerer bis hoher Hitze etwa 6 Minuten krümelig anbraten. Mit dem Kochlöffel immer wieder zerdrücken, bis das Fleisch überall Farbe hat.',
+    'Butter aufschäumen: Butter dazugeben und kurz aufschäumen lassen. Das gibt Röstaroma und später Bindung.',
+    'Mit Whisky ablöschen: Den Bratensatz vom Pfannenboden lösen. Ein bis zwei Minuten einkochen lassen, bis der Alkohol verflogen ist und nur das Aroma bleibt.',
+    'Pasta kochen: Die Rigatoni ins kochende Wasser geben und ein bis zwei Minuten kürzer garen, als auf der Packung angegeben – sie ziehen in der Pfanne nach. Vorher eine Tasse Nudelwasser abschöpfen.',
+    'Sahne einkochen: Die Sahne in die Pfanne geben und bei kleiner Hitze drei bis vier Minuten köcheln lassen, bis die Sauce leicht sämig ist.',
+    'Alles verbinden: Die abgetropften Rigatoni in die Pfanne geben und die Hitze ausschalten. Etwa 100 ml Nudelwasser und den geriebenen Pecorino unterrühren, bis die Sauce glänzt. Der Käse kommt erst vom Herd genommen dazu, sonst flockt er aus.',
+    'Servieren: Sofort auf vorgewärmte Teller geben, mit dem restlichen Pecorino und frisch gemahlenem schwarzem Pfeffer toppen.'],
+  tip:'Statt Whisky geht trockener Weißwein – weniger rauchig, genauso gut. Nach einem Rezept von gianoskitchen.',
+  nutriManual:{kcal:920, protein:32, fat:49, carbs:76} },
+
+{ chapter:'hauptspeise', title:'Burger im Pizzateig',
+  tags:['Amerikanisch','Festessen'],
+  servings:6, servingsLabel:'Stück',
+  prep:'20 Min', cookLabel:'Backen', cook:'25 Min', difficulty:'Mittel',
+  ingredients:[
+    {a:1,u:'Stück',n:'Rolle Pizzateig'},
+    {a:6,u:'Stück',n:'Rinder-Patties'},
+    {a:12,u:'Scheibe',n:'Cheddar'},
+    {a:2,u:'Stück',n:'kleine Zwiebeln'},
+    {a:3,u:'Stück',n:'Essiggurken'},
+    {a:1,u:'Stück',n:'Eigelb zum Bestreichen'},
+    {a:1,u:'Prise',n:'Salz'},
+    {a:.5,u:'TL',n:'Zucker'},
+    {a:null,u:'n. B.',n:'Sesam'},
+    {a:null,u:'n. B.',n:'Öl'},
+    {a:2,u:'EL',n:'griechischer Joghurt (Sauce)'},
+    {a:3,u:'EL',n:'Mayonnaise'},
+    {a:2,u:'EL',n:'Ketchup'},
+    {a:1,u:'Stück',n:'Essiggurke (fein gewürfelt)'},
+    {a:null,u:'n. B.',n:'geräuchertes Paprikapulver'}],
+  steps:[
+    'Zwiebeln karamellisieren: Öl erhitzen, Zwiebelringe 2 Minuten anbraten. Salz und Zucker zugeben, weitere 5 Minuten mit etwas Wasser garen. Bei kleiner Hitze weiterschmoren, bis sie ganz weich sind.',
+    'Patties garen: Heißluftfritteuse 180 °C, nach der Hälfte wenden. Alternativ Ofen 190 °C für etwa 25 Minuten oder Pfanne mit etwas Öl, häufig wenden.',
+    'Sauce anrühren: Joghurt, Mayonnaise, Ketchup, gewürfelte Gurke und Paprikapulver verrühren.',
+    'Füllen: Pizzateig in 6 Stücke schneiden, mit den Händen etwas auseinanderziehen und einzeln in eine leicht geölte Schüssel legen. Schichten: Cheddar, Patty, Sauce, Gurken, Zwiebeln, nochmals Sauce und Cheddar.',
+    'Verschließen: Teigränder zur Mitte einschlagen, die Tasche umdrehen, mit Eigelb bestreichen und mit Sesam bestreuen.',
+    'Backen: Heißluftfritteuse 180 °C für 10 bis 12 Minuten, nach der Hälfte wenden. Alternativ Ofen 190 °C für etwa 18 Minuten.'],
+  tip:'Die Taschen in Backpapier-Schälchen garen – sie fangen auslaufende Füllung auf. Zwiebeln und Patties laufen parallel.',
+  nutriManual:{kcal:520, protein:26, fat:30, carbs:36} },
+
+{ chapter:'gewuerz', title:'Sauerteigbrot',
+  tags:['Deutsch','Vorbereiten'],
+  servings:1, servingsLabel:'Brot',
+  prep:'30 Min', cookLabel:'Backen', cook:'60 Min', difficulty:'Anspruchsvoll',
+  ingredients:[
+    {a:50,u:'g',n:'warmes Wasser (Sauerteig)'},
+    {a:50,u:'g',n:'Roggenmehl (Sauerteig)'},
+    {a:5,u:'g',n:'Anstellgut'},
+    {a:500,u:'g',n:'warmes Wasser (Vorteig)'},
+    {a:40,u:'g',n:'Sauerteig (Vorteig)'},
+    {a:500,u:'g',n:'Roggenmehl (Vorteig)'},
+    {a:250,u:'g',n:'Wasser (Hauptteig)'},
+    {a:250,u:'g',n:'Roggenmehl (Hauptteig)'},
+    {a:300,u:'g',n:'Dinkelmehl'},
+    {a:22,u:'g',n:'Salz'},
+    {a:30,u:'g',n:'Honig'},
+    {a:null,u:'n. B.',n:'Brotgewürze'},
+    {a:null,u:'n. B.',n:'Olivenöl'}],
+  steps:[
+    'Am Vorabend: Sauerteig anfrischen. Für den Vorteig alles vermischen und abgedeckt 10 bis 15 Stunden stehen lassen.',
+    'Kneten: Alle Zutaten des Hauptteigs zum Vorteig geben und bei niedrigster Stufe mit dem Knethaken 10 Minuten kneten. In den letzten 2 Minuten etwas Olivenöl darunter kneten.',
+    'Offen stehen lassen: 45 Minuten ruhen lassen.',
+    'Formen und gehen lassen: Teig auf die bemehlte Arbeitsfläche geben, großzügig bemehlen und zur Kugel beziehungsweise zur Form des Gärkorbs formen – nicht kneten. Tuch in den Gärkorb, zugedeckt an einem warmen Ort 2 Stunden gehen lassen.',
+    'Ofen auf 250 °C vorheizen, mit Backblech, Pizzastein und Auflaufform. Ein Glas Wasser in die Auflaufform im Ofen geben.',
+    'Einschießen: Brot mit Backpapier auf Backblech oder Pizzastein geben und schnell einschneiden.',
+    'Nach 5 Minuten das Backrohr 45 Sekunden öffnen und auf 200 °C reduzieren.',
+    'Insgesamt 60 Minuten backen.',
+    'Rasten lassen: Vor dem Anschneiden 60 Minuten auskühlen lassen.'],
+  tip:'Backtag rund 5 Stunden, dazu der Vorteig über Nacht. Nährwerte je Scheibe von etwa 60 g.',
+  nutriManual:{kcal:140, protein:4, fat:1, carbs:28} },
+
+{ chapter:'snack', title:'Blaubeer-Smoothie-Bowl',
+  tags:['High Protein','Schnell','Vegetarisch'],
+  servings:1, servingsLabel:'Bowl',
+  prep:'5 Min', cookLabel:'Kochen', cook:'—', difficulty:'Leicht',
+  ingredients:[
+    {a:1,u:'Stück',n:'gefrorene Banane'},
+    {a:150,u:'g',n:'gefrorene Blaubeeren'},
+    {a:120,u:'g',n:'griechischer Joghurt'},
+    {a:60,u:'ml',n:'Milch'},
+    {a:30,u:'g',n:'Vanille-Proteinpulver'},
+    {a:2,u:'EL',n:'Ahornsirup oder Honig'}],
+  steps:[
+    'Mixen: Alle Zutaten in den Mixer geben, gefrorene Früchte zuerst. So lange mixen, bis die Masse cremig ist – zwischendurch stoppen und die Ränder herunterschieben.',
+    'Dick bleiben lassen: Flüssigkeit nur löffelweise nachgeben. Die Masse soll die Konsistenz von Softeis haben und nicht fließen.',
+    'Anrichten: In eine vorgekühlte Schüssel füllen, glatt streichen, toppen und sofort essen – sonst wird die Bowl flüssig.'],
+  tip:'Toppings nach Lust und Laune: Banane, Beeren, Granola, Kokosraspeln, Kürbiskerne, Chiasamen oder Zartbitterschokolade.',
+  nutriManual:{kcal:430, protein:35, fat:6, carbs:58} },
+
+{ chapter:'snack', title:'Grüne Smoothie-Bowl',
+  tags:['High Protein','Leichte Kost','Vegetarisch'],
+  servings:1, servingsLabel:'Bowl',
+  prep:'5 Min', cookLabel:'Kochen', cook:'—', difficulty:'Leicht',
+  ingredients:[
+    {a:1,u:'Stück',n:'gefrorene Banane'},
+    {a:.5,u:'Stück',n:'gefrorene Avocado'},
+    {a:1,u:'Stück',n:'gefrorene Kiwi'},
+    {a:1,u:'Handvoll',n:'Spinat'},
+    {a:30,u:'g',n:'Vanille-Proteinpulver'},
+    {a:2,u:'EL',n:'Ahornsirup oder Honig'},
+    {a:60,u:'ml',n:'Wasser oder Milch'}],
+  steps:[
+    'Mixen: Alle Zutaten in den Mixer geben, gefrorene Früchte zuerst. So lange mixen, bis die Masse cremig ist – zwischendurch stoppen und die Ränder herunterschieben.',
+    'Dick bleiben lassen: Flüssigkeit nur löffelweise nachgeben. Die Masse soll die Konsistenz von Softeis haben und nicht fließen.',
+    'Anrichten: In eine vorgekühlte Schüssel füllen, glatt streichen, toppen und sofort essen.'],
+  tip:'Ohne Proteinpulver funktioniert die Bowl ebenso – dann etwas weniger Flüssigkeit nehmen.',
+  nutriManual:{kcal:420, protein:30, fat:14, carbs:44} },
+
+{ chapter:'snack', title:'Mango-Ananas-Smoothie-Bowl',
+  tags:['High Protein','Schnell','Vegetarisch'],
+  servings:1, servingsLabel:'Bowl',
+  prep:'5 Min', cookLabel:'Kochen', cook:'—', difficulty:'Leicht',
+  ingredients:[
+    {a:1,u:'Stück',n:'gefrorene Banane'},
+    {a:75,u:'g',n:'gefrorene Mango'},
+    {a:80,u:'g',n:'gefrorene Ananas'},
+    {a:120,u:'g',n:'griechischer Joghurt'},
+    {a:60,u:'ml',n:'Kokoswasser'},
+    {a:30,u:'g',n:'Vanille-Proteinpulver'},
+    {a:2,u:'EL',n:'Ahornsirup oder Honig'}],
+  steps:[
+    'Mixen: Alle Zutaten in den Mixer geben, gefrorene Früchte zuerst. So lange mixen, bis die Masse cremig ist – zwischendurch stoppen und die Ränder herunterschieben.',
+    'Dick bleiben lassen: Flüssigkeit nur löffelweise nachgeben. Die Masse soll die Konsistenz von Softeis haben und nicht fließen.',
+    'Anrichten: In eine vorgekühlte Schüssel füllen, glatt streichen, toppen und sofort essen.'],
+  tip:'Griechischer Joghurt lässt sich 1:1 durch Skyr oder eine pflanzliche Alternative ersetzen.',
+  nutriManual:{kcal:440, protein:34, fat:5, carbs:64} },
+
+{ chapter:'snack', title:'Schoko-Smoothie-Bowl',
+  tags:['High Protein','Schnell','Vegetarisch'],
+  servings:1, servingsLabel:'Bowl',
+  prep:'5 Min', cookLabel:'Kochen', cook:'—', difficulty:'Leicht',
+  ingredients:[
+    {a:2,u:'Stück',n:'gefrorene Bananen'},
+    {a:120,u:'g',n:'griechischer Joghurt'},
+    {a:60,u:'ml',n:'Milch'},
+    {a:2,u:'EL',n:'Backkakao'},
+    {a:30,u:'g',n:'Schoko-Proteinpulver'},
+    {a:1,u:'EL',n:'Erdnussbutter'},
+    {a:2,u:'EL',n:'Ahornsirup oder Honig'}],
+  steps:[
+    'Mixen: Alle Zutaten in den Mixer geben, gefrorene Bananen zuerst. So lange mixen, bis die Masse cremig ist – zwischendurch stoppen und die Ränder herunterschieben.',
+    'Dick bleiben lassen: Flüssigkeit nur löffelweise nachgeben. Die Masse soll die Konsistenz von Softeis haben und nicht fließen.',
+    'Anrichten: In eine vorgekühlte Schüssel füllen, glatt streichen, toppen und sofort essen.'],
+  tip:'Reife Bananen süßen meist schon genug – der Sirup ist Geschmackssache.',
+  nutriManual:{kcal:560, protein:38, fat:14, carbs:70} }
+];
+
+/* =========================================================================
+   TEIL 2 — Werkzeuge, Speicher, Nährwertschätzung
+   ========================================================================= */
+
+const $  = s => document.querySelector(s);
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+
+/* Brüche schön schreiben: 0.5 -> ½, 1.5 -> 1½ */
+const FRAC = {'.25':'¼','.5':'½','.75':'¾','.33':'⅓','.67':'⅔'};
+function num(n){
+  if(n==null || isNaN(n)) return '';
+  const neg = n<0; n = Math.abs(n);
+  const whole = Math.floor(n+1e-9), rest = +(n-whole).toFixed(2);
+  let f = FRAC[String(rest).replace(/^0/,'')];
+  let out;
+  if(f) out = (whole?whole:'') + f;
+  else if(Math.abs(n-Math.round(n))<0.05) out = String(Math.round(n));
+  else out = String(+n.toFixed(1)).replace('.',',');
+  return (neg?'-':'') + out;
+}
+
+/* ---------------------------- Speicher ---------------------------------- */
+const KEY = 'rezeptbuch.v1';
+const DATA_VERSION = 2;      /* 2 = mit Ergibt-Angabe je Rezept */
+const DEFAULT_STATE = {
+  settings:{ title:'Unser Rezeptbuch', subtitle:'Gesammelt & gekocht',
+             meals:['mittag','abend'], shopSort:'dept', printFormat:'a4',
+             printCover:true, printNotes:true, printMargin:true, hintSeen:false },
+  recipes:[], plan:{ persons:{}, entries:{} },
+  shopDone:{}, shopExtra:[], pantry:[]
+};
+const MEALS = [
+  {id:'fruehstueck', label:'Frühstück'}, {id:'mittag', label:'Mittag'},
+  {id:'abend', label:'Abend'},           {id:'snack',  label:'Snack'}
+];
+const DAYS = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
+
+/* Ein Rezept aus fremder Quelle kann Felder vermissen – aus einer älteren
+   Fassung der App, aus einem alten Backup, aus einem halben Import. Hier wird
+   jedes Rezept auf einen vollständigen Stand gebracht. */
+function normalizeRecipe(r){
+  const b = blankRecipe();
+  const out = Object.assign(b, r || {});
+  out.id = out.id || uid();
+  out.title = String(out.title || 'Ohne Titel');
+  if(!CHAPTERS.some(c=>c.id===out.chapter)) out.chapter = 'hauptspeise';
+  out.tags = Array.isArray(out.tags) ? out.tags.slice(0, MAX_TAGS) : [];
+  out.servings = (+out.servings > 0) ? +out.servings : 4;
+  out.servingsLabel = out.servingsLabel || 'Portionen';
+  out.ingredients = Array.isArray(out.ingredients) && out.ingredients.length
+    ? out.ingredients.map(i=>({ a:(i && i.a != null && !isNaN(+i.a)) ? +i.a : null,
+        u:(i && i.u) || 'g', n:String((i && i.n) || '') })).filter(i=>i.n)
+    : [];
+  if(!out.ingredients.length) out.ingredients = [{a:null,u:'g',n:''}];
+  out.steps = Array.isArray(out.steps) ? out.steps.map(x=>String(x||'')).filter(Boolean) : [];
+  if(!out.steps.length) out.steps = [''];
+  out.log = Array.isArray(out.log) ? out.log : [];
+  out.tip = String(out.tip || '');
+  if(out.nutriManual && typeof out.nutriManual !== 'object') out.nutriManual = null;
+  return out;
+}
+function normalizeState(p){
+  const st = Object.assign({}, JSON.parse(JSON.stringify(DEFAULT_STATE)), p || {});
+  st.settings = Object.assign({}, DEFAULT_STATE.settings, (p && p.settings) || {});
+  st.recipes = Array.isArray(p && p.recipes) ? p.recipes.map(normalizeRecipe) : [];
+  st.plan = Object.assign({persons:{}, entries:{}}, (p && p.plan) || {});
+  st.shopDone = (p && p.shopDone) || {};
+  st.shopExtra = Array.isArray(p && p.shopExtra) ? p.shopExtra : [];
+  st.pantry = Array.isArray(p && p.pantry) ? p.pantry : [];
+  delete st.app; delete st.version; delete st.exportedAt;  /* nur Kopfdaten der Datei */
+  return st;
+}
+
+let S = load();
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw) return normalizeState(JSON.parse(raw));
+  }catch(e){ console.warn('Konnte gespeicherte Daten nicht lesen:', e); }
+  const s = JSON.parse(JSON.stringify(DEFAULT_STATE));
+  s.recipes = SEED.map(r => normalizeRecipe(Object.assign({id:uid(),
+    createdAt:Date.now()}, r)));
+  return s;
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }
+  catch(e){ toast('Speichern nicht möglich – bitte Backup exportieren.'); }
+}
+
+/* Nicht jeder Browser gibt die Zwischenablage frei – dann zeigen wir den Text
+   zum Selberkopieren an, statt kommentarlos nichts zu tun. */
+function copyText(text, okMsg, fallbackField){
+  const zeigen = () => {
+    if(fallbackField){ fallbackField.value = text; fallbackField.focus();
+      fallbackField.select(); toast('Bitte von Hand kopieren – Text ist markiert.'); }
+    else toast('Kopieren ist in diesem Browser nicht erlaubt.');
+  };
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText)
+      navigator.clipboard.writeText(text).then(()=>toast(okMsg), zeigen);
+    else zeigen();
+  }catch(e){ zeigen(); }
+}
+function toast(msg){
+  let t = $('#toast');
+  if(!t){ t = document.createElement('div'); t.id='toast';
+    t.style.cssText='position:fixed;left:50%;bottom:26px;transform:translateX(-50%);'+
+      'background:#1f1d1a;color:#fff;padding:11px 18px;border-radius:9px;font-size:13.5px;'+
+      'z-index:200;box-shadow:0 4px 18px rgba(0,0,0,.25)';
+    document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity='1';
+  clearTimeout(t._h); t._h = setTimeout(()=>{ t.style.opacity='0'; }, 2600);
+}
+
+/* Was praktisch immer im Haus ist – zählt bei der Vorratssuche nicht als „fehlt“ */
+const STAPLES = ['salz','pfeff','öl','olivenöl','essig','zuck','mehl','wass','butt',
+  'paprikapulv','oregano','zimt','curry','kreuzkümmel','chiliflock','cayenne','muskat',
+  'backpulv','speisestärk','honig','senf','sojasauc'];
+const isStaple = key => STAPLES.includes(key) ||
+  STAPLES.some(x => key === x || key.endsWith(' '+x));
+
+/* ------------------------ Nährwertschätzung ----------------------------- */
+const norm = s => String(s||'').toLowerCase().replace(/[.,()]/g,' ').replace(/\s+/g,' ').trim();
+
+/* Ein und dieselbe Zutat wird unterschiedlich geschrieben: „Tomaten“,
+   „reife Tomaten“, „Tomaten, gewürfelt“. Für Einkaufsliste und Vorratssuche
+   brauchen wir daraus einen gemeinsamen Schlüssel. */
+const FILLER = new Set(['frisch','frische','frischer','frisches','reif','reife','reifer',
+  'reifes','gehackt','gehackte','gehackter','fein','feine','feiner','klein','kleine',
+  'gross','grosse','groß','große','gewürfelt','gewürfelte','getrocknet','getrocknete',
+  'gemahlen','gemahlene','gemahlener','gerieben','geriebene','geriebener','bio','ca',
+  'etwa','optional','zum','und','oder','nach','belieben','stück','stücke','davon',
+  'gewaschen','geschält','geputzt','weich','hart','warm','kalt','mittelgroß']);
+const SYNONYM = { 'eier':'ei','möhre':'karotte','möhren':'karotte','mohrrübe':'karotte',
+  'rahm':'sahne','obers':'sahne','erdapfel':'kartoffel','erdäpfel':'kartoffel',
+  'paradeiser':'tomate','germ':'hefe','topfen':'quark','fisolen':'bohne' };
+function stem(w){
+  if(SYNONYM[w]) w = SYNONYM[w];
+  if(w.length > 4) w = w.replace(/(chen|lein|en|er|n|e|s)$/,'');
+  return w;
+}
+function canonical(name){
+  const base = norm(String(name||'').replace(/\([^)]*\)/g,' ').split(',')[0]);
+  const words = base.split(' ').filter(w => w && !FILLER.has(w));
+  const out = words.map(stem).filter(Boolean);
+  return out.length ? out.join(' ') : base;
+}
+function findFood(name){
+  const n = norm(name); let best=null, len=0;
+  for(const f of FOODS){ if(n.includes(f[0]) && f[0].length>len){ best=f; len=f[0].length; } }
+  return best;
+}
+/* Menge einer Zutat in Gramm — nutzt Stück-/EL-Gewichte aus der Tabelle */
+function grams(ing){
+  if(ing.a==null || ing.u==='n. B.') return 0;
+  const f = findFood(ing.n), d = unitDef(ing.u);
+  if(ing.u==='Stück')   return ing.a * ((f && f[6]) || 100);
+  if(ing.u==='EL')      return ing.a * ((f && f[7]) || 15);
+  if(ing.u==='TL')      return ing.a * ((f && f[7]) ? f[7]/3 : 5);
+  if(ing.u==='Scheibe') return ing.a * ((f && f[6]) || 25);
+  return ing.a * (d.g==null ? 100 : d.g);
+}
+function estimate(r){
+  let k=0,p=0,fa=0,c=0; const unknown=[];
+  for(const ing of (r.ingredients||[])){
+    if(!ing.n) continue;
+    const f = findFood(ing.n);
+    if(!f){ if(ing.a!=null && ing.u!=='n. B.') unknown.push(ing.n); continue; }
+    const g = grams(ing)/100;
+    k += f[1]*g; p += f[2]*g; fa += f[3]*g; c += f[4]*g;
+  }
+  const per = v => v / yieldOf(r);
+  return { kcal:Math.round(per(k)/5)*5, protein:Math.round(per(p)),
+           fat:Math.round(per(fa)), carbs:Math.round(per(c)), unknown };
+}
+const nutriOf = r => r.nutriManual || estimate(r);
+/* Nicht jedes Rezept ergibt vier Portionen: ein Brot, sechs Taschen, eine Bowl. */
+const yieldOf = r => (r && +r.servings > 0) ? +r.servings : 4;
+const yieldLabel = r => (r && r.servingsLabel) ? r.servingsLabel : 'Portionen';
+function deptOf(name){ const f=findFood(name); return f ? f[5] : 'son'; }
+
+/* =========================================================================
+   TEIL 3 — Buchseiten (identisch in Vorschau und Druck)
+   ========================================================================= */
+
+function ingLine(ing, factor){
+  const a = (ing.a==null) ? '' : num(ing.a*(factor||1));
+  const u = (ing.u==='n. B.') ? 'n. B.'
+          : (ing.u==='Stück' ? '' : unitLabel(ing.u, ing.a*(factor||1)));
+  const amt = (a + ' ' + u).trim();
+  return '<li><span class="amount">'+esc(amt)+'</span><span>'+esc(ing.n)+'</span></li>';
+}
+
+function sheetRecipe(r, factor, servings){
+  servings = servings || yieldOf(r);
+  const ch = chapterOf(r.chapter), n = nutriOf(r);
+  const tags = (r.tags||[]).slice(0,MAX_TAGS).map(t=>'<span>'+esc(t)+'</span>')
+               .join('<span class="sep">·</span>');
+  const meta = [['Vorbereitung', r.prep], [r.cookLabel||'Kochen', r.cook],
+                ['Schwierigkeit', r.difficulty],
+                [yieldLabel(r), String(num(servings))]]
+    .filter(m=>m[1]).map(m=>'<div><dt>'+esc(m[0])+'</dt><dd>'+esc(m[1])+'</dd></div>').join('');
+  const nut = [['kcal',n.kcal],['Eiweiß',n.protein+' g'],['Fett',n.fat+' g'],
+               ['Kohlenhydrate',n.carbs+' g']]
+    .map(x=>'<div class="nutri-row"><span class="nutri-key">'+x[0]+'</span>'+
+            '<span class="nutri-val">'+x[1]+'</span></div>').join('');
+  return '<section class="sheet front" data-fit="1">'+
+    '<div class="head">'+icon(r.chapter,'9mm','bicon')+
+      '<div class="kind">'+esc(ch.one)+'</div><h1>'+esc(r.title)+'</h1>'+
+      '<div class="tags">'+tags+'</div></div>'+
+    '<hr class="rule"><dl class="meta">'+meta+'</dl>'+
+    '<div class="body-grid"><div class="col-left'+
+      ((r.ingredients||[]).length > 12 ? ' dense' : '')+'"><h2>Zutaten</h2>'+
+      '<ul class="ingredients">'+(r.ingredients||[]).map(i=>ingLine(i,factor)).join('')+'</ul>'+
+      '<div class="nutri"><div class="nutri-label">Pro Portion (ca.)</div>'+nut+'</div></div>'+
+    '<div class="col-right'+
+      (((r.steps||[]).join(' ').length > 780 || (r.steps||[]).length > 6)
+        ? ' dense' : '')+'"><h2>Zubereitung</h2><ol class="steps">'+
+      (r.steps||[]).map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol>'+
+      (r.tip?'<p class="tip">Tipp: '+esc(r.tip)+'</p>':'')+
+    '</div></div></section>';
+}
+
+function sheetNotes(r){
+  /* Was im Kochmodus eingetragen wurde, steht schon gedruckt da –
+     die restlichen Zeilen bleiben zum Ausfüllen frei. */
+  const log = (r.log || []).slice(-4);
+  const rows = Array.from({length:4}).map((_,k)=>{
+    const e = log[k];
+    if(!e) return '<tr><td class="c-date"></td><td></td><td class="c-guest"></td>'+
+      '<td class="c-rate">○ ○ ○ ○ ○</td></tr>';
+    const stars = '●'.repeat(e.rating||0) + '○'.repeat(5-(e.rating||0));
+    return '<tr><td class="c-date">'+esc(e.date)+'</td><td>'+esc(e.occasion||'')+'</td>'+
+      '<td class="c-guest">'+(e.guests||'')+'</td>'+
+      '<td class="c-rate">'+stars.split('').join(' ')+'</td></tr>';
+  }).join('');
+  return '<section class="sheet back">'+
+    '<div class="note-head"><span class="t">Notizen</span>'+
+      '<span class="r">'+esc(r.title)+'</span></div>'+
+    '<div class="from"><span class="lbl">Rezept von</span><span class="fill"></span></div>'+
+    '<h2>Bereits gekocht</h2><table class="cooked"><thead><tr>'+
+      '<th class="c-date">Datum</th><th>Anlass</th><th class="c-guest">Gäste</th>'+
+      '<th class="c-rate">Bewertung</th></tr></thead><tbody>'+rows+'</tbody></table>'+
+    '<h2>Anmerkungen &amp; Abwandlungen</h2><div class="lines">'+
+      '<div></div>'.repeat(11)+'</div></section>';
+}
+
+function sheetCover(){
+  return '<section class="sheet front cover"><div class="frame">'+
+    icon('cloche','14mm','bicon')+
+    '<h1>'+esc(S.settings.title).replace(/ /g,'<br>')+'</h1><div class="dash"></div>'+
+    '<div class="sub">'+esc(S.settings.subtitle)+'</div></div></section>';
+}
+function sheetDivider(ch, i){
+  return '<section class="sheet front divider">'+
+    '<div class="tab" style="top:'+(34+i*34)+'mm"><span>'+esc(ch.many)+'</span></div>'+
+    icon(ch.id,'20mm','bicon')+'<h1>'+esc(ch.many)+'</h1><div class="dash"></div></section>';
+}
+const sheetBlank = () => '<section class="sheet back"></section>';
+
+function sheetList(groups, title, when){
+  let body='';
+  for(const g of groups){
+    body += '<div class="g">'+esc(g.label)+'</div>';
+    for(const it of g.items)
+      body += '<div class="it"><span class="box"></span>'+
+              '<span class="q">'+esc(it.qty)+'</span><span>'+esc(it.name)+'</span></div>';
+  }
+  return '<section class="sheet list"><h1>'+esc(title)+'</h1>'+
+         '<div class="when">'+esc(when)+'</div>'+body+'</section>';
+}
+
+/* Automatische Schriftanpassung + Umbruch auf eine zweite Seite */
+function fitSheets(root){
+  root.querySelectorAll('.sheet[data-fit]').forEach(sheet=>{
+    const grid = sheet.querySelector('.body-grid');
+    const right = sheet.querySelector('.col-right');
+    if(!grid || !right) return;
+    const sizes = [8.8, 8.4, 8.0, 7.6, 7.3];
+    const steps = right.querySelector('.steps');
+    const tip   = right.querySelector('.tip');
+    /* Lange Zutatenlisten sprengen sonst die linke Spalte */
+    const left = sheet.querySelector('.col-left');
+    const ings = sheet.querySelector('.ingredients');
+    if(left && ings){
+      let k = 0;
+      while(left.scrollHeight > grid.clientHeight + 1 && k < sizes.length-1){
+        k++;
+        ings.style.fontSize = sizes[k]+'pt';
+        ings.querySelectorAll('li').forEach(li=>{
+          li.style.padding = (1 - k*0.12)+'mm 0';
+          li.style.lineHeight = '1.28';
+        });
+      }
+    }
+    let i = 0;
+    const over = () => right.scrollHeight > grid.clientHeight + 1;
+    while(over() && i < sizes.length-1){
+      i++;
+      if(steps) steps.style.fontSize = sizes[i]+'pt';
+      if(tip)   tip.style.fontSize   = (sizes[i]-1.2)+'pt';
+    }
+    if(!over() || !steps) return;
+    /* Passt immer noch nicht: restliche Schritte auf eine Folgeseite */
+    const lis = Array.from(steps.children);
+    const limit = grid.clientHeight - (tip ? tip.offsetHeight + 14 : 0);
+    let cut = lis.length;
+    for(let k=0;k<lis.length;k++){
+      if(lis[k].offsetTop + lis[k].offsetHeight > limit){ cut = k; break; }
+    }
+    if(cut < 1 || cut >= lis.length) return;
+    const rest = lis.slice(cut);
+    rest.forEach(li=>li.remove());
+    const cont = document.createElement('section');
+    cont.className = 'sheet front';
+    cont.innerHTML =
+      '<div class="note-head"><span class="t">Fortsetzung</span>'+
+      '<span class="r">'+sheet.querySelector('h1').textContent+'</span></div>'+
+      '<ol class="steps" start="'+(cut+1)+'" style="counter-reset:s '+cut+
+      ';font-size:'+sizes[i]+'pt">'+rest.map(li=>li.outerHTML).join('')+'</ol>'+
+      (tip ? '<p class="tip">'+tip.innerHTML+'</p>' : '');
+    if(tip) tip.remove();
+    sheet.after(cont);
+  });
+}
+
+/* =========================================================================
+   TEIL 4 — Oberfläche
+   ========================================================================= */
+
+const ROUTES = [['book','Rezepte'],['ideas','Was koche ich?'],['plan','Wochenplan'],
+                ['shop','Einkaufsliste'],['print','Drucken & Export'],
+                ['settings','Einstellungen']];
+let route = 'book';
+let filter = { q:'', chapter:'', tags:[] };
+let tagsOpen = false;
+let selection = new Set();
+
+function render(){
+  $('#brandBox').innerHTML = esc(S.settings.title)+'<small>'+
+    S.recipes.length+' Rezepte</small>';
+  $('#nav').innerHTML = ROUTES.map(r=>
+    '<button data-r="'+r[0]+'" class="'+(route===r[0]?'on':'')+'">'+r[1]+'</button>').join('');
+  $('#nav').onclick = e => { const b=e.target.closest('button'); if(!b) return;
+    route = b.dataset.r; render(); window.scrollTo(0,0); };
+  ({book:viewBook, ideas:viewIdeas, plan:viewPlan, shop:viewShop, print:viewPrint,
+    settings:viewSettings})[route]();
+}
+
+/* ----------------------------- Rezepte ---------------------------------- */
+function allTags(){
+  const s = new Set(); S.recipes.forEach(r=>(r.tags||[]).forEach(t=>s.add(t)));
+  return Array.from(s).sort((a,b)=>a.localeCompare(b,'de'));
+}
+function filtered(){
+  const q = norm(filter.q);
+  return S.recipes.filter(r=>{
+    if(filter.chapter && r.chapter!==filter.chapter) return false;
+    if(filter.tags.length && !filter.tags.every(t=>(r.tags||[]).includes(t))) return false;
+    if(q){
+      const hay = norm(r.title+' '+(r.tags||[]).join(' ')+' '+
+        (r.ingredients||[]).map(i=>i.n).join(' '));
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+let pickMode = false;
+function viewBook(){
+  const list = filtered(), tags = allTags();
+  const filterOn = filter.tags.length > 0;
+  $('#view').innerHTML =
+    '<div class="hero"><h2>Rezepte</h2>'+
+      '<span class="count">'+S.recipes.length+' im Buch</span>'+
+      '<span class="sp"></span>'+
+      (pickMode
+        ? '<button class="btn '+(selection.size?'primary':'')+'" id="printSel">'+
+            (selection.size ? selection.size+' drucken' : 'nichts gewählt')+'</button>'+
+          '<button class="btn ghost" id="pickOff">Fertig</button>'
+        : '<button class="btn primary" id="newR">+ Rezept</button>'+
+          '<button class="btn" id="impR">Importieren</button>')+
+    '</div>'+
+    '<div class="search">'+
+      '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/>'+
+        '<line x1="16.2" y1="16.2" x2="21" y2="21" stroke-linecap="round"/></svg>'+
+      '<input type="text" id="q" placeholder="Suchen – Titel, Zutat oder Tag" value="'+
+        esc(filter.q)+'"></div>'+
+    '<div class="tabs" id="chChips">'+
+      '<button class="'+(!filter.chapter?'on':'')+'" data-c="">Alle</button>'+
+      CHAPTERS.filter(c=>S.recipes.some(r=>r.chapter===c.id))
+        .map(c=>'<button class="'+(filter.chapter===c.id?'on':'')+
+          '" data-c="'+c.id+'">'+esc(c.many)+'</button>').join('')+
+      '<span class="sp"></span>'+
+      (tags.length ? '<button class="more" id="fToggle">'+
+        (tagsOpen||filterOn ? 'Filter ausblenden' : 'Filter')+'</button>' : '')+
+      (!pickMode ? '<button class="more" id="pickOn">Auswählen</button>' : '')+
+    '</div>'+
+    ((tagsOpen||filterOn) && tags.length
+      ? '<div class="filters"><div class="chips" id="tgChips">'+tags.map(t=>
+          '<button class="chip '+(filter.tags.includes(t)?'on':'')+'" data-t="'+esc(t)+'">'+
+          esc(t)+'</button>').join('')+
+        (filterOn ? '<button class="chip" data-clear="1">zurücksetzen</button>' : '')+
+        '</div></div>' : '')+
+    (list.length ? '<div class="grid" id="grid">'+list.map(card).join('')+'</div>'
+      : '<div class="empty"><p>Hier ist noch nichts.</p>'+
+        '<button class="btn primary" id="newR2">Erstes Rezept anlegen</button></div>');
+
+  $('#q').oninput = e => { filter.q = e.target.value; const p=e.target.selectionStart;
+    viewBook(); const n=$('#q'); n.focus(); n.setSelectionRange(p,p); };
+  const open = () => editRecipe(null);
+  if($('#newR'))  $('#newR').onclick  = open;
+  if($('#newR2')) $('#newR2').onclick = open;
+  if($('#impR'))  $('#impR').onclick  = importDialog;
+  if($('#pickOn'))  $('#pickOn').onclick  = () => { pickMode = true; viewBook(); };
+  if($('#pickOff')) $('#pickOff').onclick = () => { pickMode = false; selection.clear();
+    viewBook(); };
+  if($('#fToggle')) $('#fToggle').onclick = () => {
+    if(tagsOpen || filterOn){ tagsOpen = false; filter.tags = []; }
+    else tagsOpen = true;
+    viewBook(); };
+  if($('#printSel')) $('#printSel').onclick = () => {
+    if(!selection.size){ toast('Erst Rezepte antippen.'); return; }
+    doPrint('selection'); };
+  $('#chChips').onclick = e => { const b=e.target.closest('[data-c]'); if(!b) return;
+    filter.chapter = b.dataset.c; viewBook(); };
+  if($('#tgChips')) $('#tgChips').onclick = e => {
+    if(e.target.closest('[data-clear]')){ filter.tags=[]; viewBook(); return; }
+    const b=e.target.closest('[data-t]');
+    if(!b) return; const t=b.dataset.t;
+    filter.tags = filter.tags.includes(t) ? filter.tags.filter(x=>x!==t)
+                                          : filter.tags.concat([t]);
+    viewBook(); };
+  if($('#grid')) $('#grid').onclick = e => {
+    const c = e.target.closest('.rcard'); if(!c) return;
+    if(pickMode){
+      selection.has(c.dataset.id) ? selection.delete(c.dataset.id)
+                                  : selection.add(c.dataset.id);
+      viewBook(); return;
+    }
+    showRecipe(c.dataset.id);
+  };
+}
+function lastCooked(r){
+  const log = r.log || [];
+  return log.length ? log[log.length-1].date : '';
+}
+function card(r){
+  const n = nutriOf(r), ch = chapterOf(r.chapter);
+  const foot = [n.kcal+' kcal', r.prep].filter(Boolean).join(' · ');
+  return '<div class="rcard'+(pickMode && selection.has(r.id)?' picked':'')+
+    '" data-id="'+r.id+'">'+
+    (pickMode ? '<input type="checkbox" class="sel" '+
+      (selection.has(r.id)?'checked':'')+' tabindex="-1">' : '')+
+    icon(r.chapter,'26px','ico')+
+    '<div class="kind">'+esc(ch.one)+'</div><h3>'+esc(r.title)+'</h3>'+
+    '<div class="ft">'+esc(foot)+'</div>'+
+    (lastCooked(r) ? '<div class="last">zuletzt '+esc(lastCooked(r))+'</div>' : '')+
+    '</div>';
+}
+
+/* ------------------------- Rezept-Detailansicht --------------------------
+   Am Bildschirm zählt Lesbarkeit, auf dem Papier das Buchbild. Deshalb hier
+   eine eigene Ansicht statt einer geschrumpften Druckseite. */
+let detailServings = 4;
+let bookView = false;
+const pvCls = () => S.settings.printFormat==='a4' ? 'pv-a4' : 'pv-a5';
+
+function showRecipe(id){
+  const r = S.recipes.find(x=>x.id===id); if(!r) return;
+  detailServings = yieldOf(r); bookView = false;
+  const draw = m => {
+    m.querySelector('.modal-body').innerHTML = recipeViewHTML(r);
+    bindRecipeView(m, r);
+  };
+  openModal(r.title, recipeViewHTML(r), [], m => bindRecipeView(m, r));
+  window.__redrawRecipe = () => draw($('#modalRoot .modal'));
+}
+
+function recipeViewHTML(r){
+  const f = detailServings / yieldOf(r);
+  if(bookView)
+    return actionsHTML(r) +
+      '<div class="preview">'+
+        '<div class="pv-scale '+pvCls()+'">'+paper(sheetRecipe(r,f,detailServings))+'</div>'+
+        '<div class="pv-scale '+pvCls()+'">'+paper(sheetNotes(r))+'</div></div>';
+
+  const ch = chapterOf(r.chapter), n = nutriOf(r);
+  const meta = [['Vorbereitung', r.prep], [r.cookLabel||'Kochen', r.cook],
+                ['Schwierigkeit', r.difficulty],
+                [yieldLabel(r), String(num(detailServings))]]
+    .filter(x=>x[1]).map(x=>'<div><dt>'+esc(x[0])+'</dt><dd>'+esc(x[1])+'</dd></div>').join('');
+  return actionsHTML(r) +
+    '<div class="rv-head">'+icon(r.chapter,'34px','ico')+
+      '<div class="rv-kind">'+esc(ch.one)+'</div>'+
+      '<h2>'+esc(r.title)+'</h2>'+
+      '<div class="rv-tags">'+(r.tags||[]).slice(0,MAX_TAGS)
+        .map(t=>'<span>'+esc(t)+'</span>').join('')+'</div></div>'+
+    '<dl class="rv-meta">'+meta+'</dl>'+
+    '<div class="rv-cols">'+
+      '<div class="rv-ing"><div class="rv-h">Zutaten</div><ul>'+
+        (r.ingredients||[]).map(i=>'<li><span class="a">'+esc(amountText(i,f))+
+          '</span><span>'+esc(i.n)+'</span></li>').join('')+'</ul>'+
+        '<div class="rv-nutri">'+
+          [['kcal',n.kcal],['Eiweiß',n.protein+' g'],['Fett',n.fat+' g'],
+           ['Kohlenh.',n.carbs+' g']]
+          .map(x=>'<div><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('')+
+        '</div></div>'+
+      '<div class="rv-steps"><div class="rv-h">Zubereitung</div><ol>'+
+        (r.steps||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ol>'+
+        (r.tip ? '<div class="rv-tip">'+esc(r.tip)+'</div>' : '')+
+      '</div></div>'+
+    logHTML(r);
+}
+/* Auswahl passend zur Grundmenge: aus 6 Taschen werden 3, 6, 12 – nicht 2, 4, 8 */
+function portionChoices(r){
+  const base = yieldOf(r);
+  const set = [base/2, base, base*1.5, base*2]
+    .map(v => Math.round(v*100)/100)
+    .filter(v => v > 0);
+  return set.filter((v,i)=> set.indexOf(v) === i);
+}
+function amountText(i, f){
+  if(i.a==null) return i.u==='n. B.' ? 'n. B.' : '';
+  const a = i.a*(f||1);
+  return (num(a)+' '+(i.u==='Stück' ? '' : unitLabel(i.u,a))).trim();
+}
+function actionsHTML(r){
+  return '<div class="rv-actions">'+
+    '<button class="btn primary big" id="dCook">Kochen starten</button>'+
+    '<span style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;'+
+      'color:var(--ink-faint);margin-left:6px">'+esc(yieldLabel(r))+'</span>'+
+    portionChoices(r).map(p=>'<button class="chip '+(detailServings===p?'on':'')+
+      '" data-p="'+p+'">'+num(p)+'</button>').join('')+
+    '<span class="spacer"></span>'+
+    '<button class="btn sm" id="dBook">'+(bookView?'Zur Leseansicht':'Buchseite ansehen')+'</button>'+
+    '<button class="btn sm" id="dEdit">Bearbeiten</button>'+
+    '<button class="btn sm" id="dLog">Gekocht eintragen</button>'+
+    '<button class="btn sm" id="dShare">Als PDF teilen</button>'+
+    '<button class="btn sm danger" id="dDel">Löschen</button></div>';
+}
+function logHTML(r){
+  const log = r.log || [];
+  if(!log.length) return '';
+  return '<div class="rv-log"><div class="rv-h">Bereits gekocht</div>'+
+    log.map((e,k)=>({e:e,k:k})).reverse().map(x=>
+      '<div class="e"><b>'+esc(x.e.date)+'</b>'+
+      '<span style="flex:1">'+esc(x.e.occasion||'—')+'</span>'+
+      '<span>'+(x.e.guests?x.e.guests+' Gäste':'')+'</span>'+
+      '<span style="color:var(--accent)">'+'★'.repeat(x.e.rating||0)+'</span>'+
+      '<span class="ea">'+
+        '<button class="icon-btn" data-logedit="'+x.k+'" title="Bearbeiten">✎</button>'+
+        '<button class="icon-btn" data-logdel="'+x.k+'" title="Löschen">×</button>'+
+      '</span></div>').join('')+
+    '</div>';
+}
+function bindRecipeView(m, r){
+  const redraw = () => { m.querySelector('.modal-body').innerHTML = recipeViewHTML(r);
+    bindRecipeView(m, r); };
+  m.querySelectorAll('[data-p]').forEach(b=> b.onclick = () => {
+    detailServings = +b.dataset.p; redraw(); });
+  m.querySelector('#dBook').onclick  = () => { bookView = !bookView; redraw(); };
+  m.querySelector('#dCook').onclick  = () => { closeModal(); startCooking(r.id); };
+  m.querySelector('#dEdit').onclick  = () => { closeModal(); editRecipe(r.id); };
+  m.querySelector('#dShare').onclick = () => {
+    closeModal();
+    toast('Im Druckfenster „Als PDF sichern“ wählen – der Empfänger kann die Datei '+
+          'direkt wieder importieren.');
+    setTimeout(()=>doPrint('one', r.id), 900);
+  };
+  m.querySelector('#dLog').onclick = () => logDialog(r, -1);
+  m.querySelectorAll('[data-logedit]').forEach(b=> b.onclick = ev => {
+    ev.stopPropagation(); logDialog(r, +b.dataset.logedit); });
+  m.querySelectorAll('[data-logdel]').forEach(b=> b.onclick = ev => {
+    ev.stopPropagation();
+    const e = r.log[+b.dataset.logdel];
+    if(!confirm('Eintrag vom '+e.date+' löschen?')) return;
+    r.log.splice(+b.dataset.logdel, 1); save(); redraw(); render();
+    toast('Eintrag gelöscht.'); });
+  m.querySelector('#dDel').onclick   = () => {
+    if(!confirm('„'+r.title+'“ wirklich löschen?')) return;
+    S.recipes = S.recipes.filter(x=>x.id!==r.id); save(); closeModal(); render();
+  };
+}
+
+/* Kochen nachtragen oder einen bestehenden Eintrag ändern */
+const deToIso = d => { const p = String(d||'').split('.');
+  return p.length===3 ? p[2]+'-'+p[1].padStart(2,'0')+'-'+p[0].padStart(2,'0') : ''; };
+function logDialog(r, idx){
+  const editing = idx >= 0;
+  const e = editing ? r.log[idx] : null;
+  const heute = editing ? (deToIso(e.date) || new Date().toISOString().slice(0,10))
+                        : new Date().toISOString().slice(0,10);
+  openModal(editing ? 'Eintrag bearbeiten' : 'Gekocht eintragen',
+    '<div class="row" style="gap:12px">'+
+      '<label class="field" style="flex:1;min-width:150px"><span>Datum</span>'+
+        '<input type="date" id="lgDate" value="'+heute+'"></label>'+
+      '<label class="field" style="width:110px"><span>Gäste</span>'+
+        '<input type="number" id="lgGuests" min="0" value="'+
+        (editing ? (e.guests||0) : 4)+'"></label></div>'+
+    '<label class="field"><span>Anlass</span>'+
+      '<input type="text" id="lgOcc" value="'+(editing ? esc(e.occasion||'') : '')+
+      '" placeholder="Sonntagessen, Geburtstag …"></label>'+
+    '<label class="field"><span>Bewertung</span><select id="lgRate">'+
+      [5,4,3,2,1].map(v=>'<option value="'+v+'" '+
+        (editing && e.rating===v ? 'selected' : (!editing && v===5 ? 'selected':''))+
+        '>'+'★'.repeat(v)+'</option>').join('')+
+    '</select></label>'+
+    '<p class="hint">Der Eintrag steht danach im Rezept und wird auf der Notizseite '+
+      'mitgedruckt.</p>',
+    [editing ? '<button class="btn primary" id="lgOk">Änderung sichern</button>'
+             : '<button class="btn primary" id="lgOk">Eintragen</button>',
+     '<button class="btn ghost" id="lgNo">Abbrechen</button>'],
+    m => {
+      m.querySelector('#lgNo').onclick = () => { closeModal(); showRecipe(r.id); };
+      m.querySelector('#lgOk').onclick = () => {
+        const d = m.querySelector('#lgDate').value;
+        const entry = {
+          date: d ? d.split('-').reverse().join('.') :
+                    new Date().toLocaleDateString('de-DE'),
+          occasion: m.querySelector('#lgOcc').value.trim(),
+          guests: +m.querySelector('#lgGuests').value || 0,
+          rating: +m.querySelector('#lgRate').value || 0 };
+        r.log = r.log || [];
+        if(editing) r.log[idx] = entry; else r.log.push(entry);
+        r.log.sort((a,b)=>{
+          const k = x => x.date.split('.').reverse().join('');
+          return k(a).localeCompare(k(b));
+        });
+        save(); closeModal(); render();
+        toast(editing ? 'Geändert.' : 'Eingetragen.');
+        showRecipe(r.id);
+      };
+    }, true);
+}
+
+/* =========================================================================
+   Kochmodus — erst herrichten, dann Schritt für Schritt
+   ========================================================================= */
+let cook = null;      /* {recipe, servings, page, checked:Set, wake, timer} */
+
+async function keepAwake(on){
+  try{
+    if(on && 'wakeLock' in navigator && !cook.wake)
+      cook.wake = await navigator.wakeLock.request('screen');
+    if(!on && cook && cook.wake){ cook.wake.release(); cook.wake = null; }
+  }catch(e){ /* nicht überall verfügbar – dann bleibt es beim normalen Verhalten */ }
+}
+function startCooking(id){
+  const r = S.recipes.find(x=>x.id===id); if(!r) return;
+  cook = { r:r, servings:detailServings||yieldOf(r), page:0, checked:new Set(),
+           wake:null, timer:null };
+  $('#cookRoot').classList.add('on');
+  document.body.style.overflow = 'hidden';
+  keepAwake(true);
+  drawCook();
+}
+function endCooking(){
+  if(cook && cook.timer) clearInterval(cook.timer.h);
+  keepAwake(false);
+  $('#cookRoot').classList.remove('on');
+  $('#cookRoot').innerHTML = '';
+  document.body.style.overflow = '';
+  cook = null;
+}
+/* Welche Zutaten kommen in diesem Schritt vor? */
+function stepIngredients(step, r){
+  const t = norm(step);
+  return (r.ingredients||[]).filter(i=>{
+    const w = norm(i.n).split(' ').filter(x=>x.length>3);
+    return w.some(x=> t.includes(x.replace(/(en|er|e|n|s)$/,'')));
+  });
+}
+/* Zeitangabe im Text finden, z. B. „30 Minuten“ */
+function stepMinutes(step){
+  const m = /(\d+)\s*(?:–|-|bis)?\s*(\d+)?\s*(Minuten|Min\.|Min\b|Stunden|Std\b)/i.exec(step);
+  if(!m) return 0;
+  const v = +(m[2] || m[1]);
+  return /std|stunde/i.test(m[3]) ? v*60 : v;
+}
+function drawCook(){
+  const r = cook.r, steps = r.steps || [], total = steps.length + 2;
+  const f = cook.servings / yieldOf(r);
+  const pct = Math.round(cook.page / (total-1) * 100);
+  let body = '', foot = '';
+
+  if(cook.page === 0){                     /* Mise en place */
+    const ing = r.ingredients || [];
+    body = '<div class="ck-label">Schritt 1 · Herrichten</div>'+
+      '<h3>Alles bereitstellen</h3>'+
+      '<ul class="ck-check">'+ ing.map((i,k)=>
+        '<li class="'+(cook.checked.has(k)?'done':'')+'"><label>'+
+          '<input type="checkbox" data-i="'+k+'" '+(cook.checked.has(k)?'checked':'')+'>'+
+          '<span class="a">'+esc(amountText(i,f))+'</span>'+
+          '<span class="n">'+esc(i.n)+'</span></label></li>').join('') +'</ul>'+
+      '<p class="ck-hint" style="text-align:center">'+
+        'Mengen für '+num(cook.servings)+' '+esc(yieldLabel(r))+'. '+
+        'Abhaken ist freiwillig.</p>';
+    foot = '<button class="btn primary" data-go="1">Los geht\'s</button>';
+  } else if(cook.page <= steps.length){    /* Arbeitsschritte */
+    const k = cook.page - 1, step = steps[k];
+    const used = stepIngredients(step, r), mins = stepMinutes(step);
+    body = '<div class="ck-label">Schritt '+(k+1)+' von '+steps.length+'</div>'+
+      '<p class="ck-step">'+esc(step)+'</p>'+
+      (used.length ? '<div class="ck-hint"><span class="l">Dafür brauchst du</span>'+
+        used.map(i=>'<span class="i">'+esc(amountText(i,f))+' '+esc(i.n)+'</span>').join('')+
+        '</div>' : '')+
+      (mins ? '<div style="text-align:center"><button class="ck-timer" data-timer="'+mins+
+        '">'+timerLabel(mins)+'</button></div>' : '');
+    foot = '<button class="btn" data-go="-1">Zurück</button>'+
+           '<button class="btn primary" data-go="1">'+
+           (k+1===steps.length ? 'Fertig' : 'Weiter')+'</button>';
+  } else {                                  /* Abschluss */
+    body = '<div class="ck-done">'+icon(r.chapter,'46px','')+
+      '<div class="big">Guten Appetit</div>'+
+      '<p class="hint" style="font-size:14px">Willst du das Kochen im Rezept festhalten? '+
+      'Der Eintrag erscheint auch auf der gedruckten Notizseite.</p>'+
+      '<div style="max-width:340px;margin:22px auto 0;text-align:left">'+
+        '<label class="field"><span>Anlass</span>'+
+          '<input type="text" id="ckOcc" placeholder="Sonntagessen, Geburtstag …"></label>'+
+        '<label class="field"><span>Gäste</span>'+
+          '<input type="number" id="ckGuests" min="0" value="'+cook.servings+'"></label>'+
+        '<label class="field"><span>Bewertung</span><select id="ckRate">'+
+          [5,4,3,2,1].map(v=>'<option value="'+v+'">'+'★'.repeat(v)+'</option>').join('')+
+        '</select></label></div></div>';
+    foot = '<button class="btn" data-go="-1">Zurück</button>'+
+           '<button class="btn primary" id="ckSave">Eintragen und schließen</button>';
+  }
+
+  $('#cookRoot').innerHTML =
+    '<div class="ck-top"><div class="t">'+esc(r.title)+'</div>'+
+      '<button class="x" id="ckX">Beenden</button></div>'+
+    '<div class="ck-bar"><i style="width:'+pct+'%"></i></div>'+
+    '<div class="ck-body"><div class="ck-inner">'+body+'</div></div>'+
+    '<div class="ck-foot">'+foot+'</div>';
+  bindCook();
+}
+function timerLabel(mins){ return '⏱ '+mins+' Minuten stellen'; }
+function bindCook(){
+  const root = $('#cookRoot');
+  root.querySelector('#ckX').onclick = () => {
+    if(cook.page>0 && cook.page<= (cook.r.steps||[]).length &&
+       !confirm('Kochmodus beenden?')) return;
+    endCooking();
+  };
+  root.querySelectorAll('[data-go]').forEach(b=> b.onclick = () => {
+    if(cook.timer){ clearInterval(cook.timer.h); cook.timer=null; }
+    cook.page = Math.max(0, cook.page + (+b.dataset.go));
+    drawCook();
+    root.querySelector('.ck-body').scrollTop = 0;
+  });
+  root.querySelectorAll('[data-i]').forEach(c=> c.onchange = () => {
+    const k = +c.dataset.i;
+    c.checked ? cook.checked.add(k) : cook.checked.delete(k);
+    c.closest('li').classList.toggle('done', c.checked);
+  });
+  const t = root.querySelector('[data-timer]');
+  if(t) t.onclick = () => runTimer(t, +t.dataset.timer);
+  const sv = root.querySelector('#ckSave');
+  if(sv) sv.onclick = () => {
+    const r = cook.r;
+    r.log = r.log || [];
+    r.log.push({ date:new Date().toLocaleDateString('de-DE'),
+      occasion: root.querySelector('#ckOcc').value.trim(),
+      guests: +root.querySelector('#ckGuests').value || 0,
+      rating: +root.querySelector('#ckRate').value || 0 });
+    save(); endCooking(); toast('Ins Rezept eingetragen.');
+  };
+}
+function runTimer(btn, mins){
+  if(cook.timer){ clearInterval(cook.timer.h); cook.timer=null;
+    btn.classList.remove('run'); btn.textContent = timerLabel(mins); return; }
+  let left = mins*60;
+  btn.classList.add('run');
+  const tick = () => {
+    const mm = Math.floor(left/60), ss = left%60;
+    btn.textContent = '⏱ '+mm+':'+String(ss).padStart(2,'0')+' — antippen zum Stoppen';
+    if(left <= 0){
+      clearInterval(cook.timer.h); cook.timer = null;
+      btn.classList.remove('run'); btn.textContent = '⏱ Zeit ist um';
+      try{ navigator.vibrate && navigator.vibrate([300,120,300]); }catch(e){}
+      toast('Timer abgelaufen: '+cook.r.title);
+      return;
+    }
+    left--;
+  };
+  tick();
+  cook.timer = { h: setInterval(tick, 1000) };
+}
+
+/* ------------------------------ Modal ----------------------------------- */
+function openModal(title, html, footBtns, after, narrow){
+  $('#modalRoot').innerHTML =
+    '<div class="overlay"><div class="modal'+(narrow?' narrow':'')+'">'+
+      '<div class="modal-head"><h3>'+esc(title)+'</h3>'+
+        '<button class="btn ghost" data-close>Schließen</button></div>'+
+      '<div class="modal-body">'+html+'</div>'+
+      (footBtns&&footBtns.length ? '<div class="modal-foot">'+footBtns.join('')+'</div>' : '')+
+    '</div></div>';
+  const m = $('#modalRoot .modal');
+  $('#modalRoot').querySelector('[data-close]').onclick = closeModal;
+  $('#modalRoot .overlay').onclick = e => { if(e.target.classList.contains('overlay')) closeModal(); };
+  if(after) after(m);
+}
+const closeModal = () => { $('#modalRoot').innerHTML=''; };
+
+/* =========================================================================
+   TEIL 5 — Rezept anlegen und bearbeiten
+   ========================================================================= */
+
+let draft = null;
+
+function blankRecipe(){
+  return { id:null, chapter:'hauptspeise', title:'', tags:[], prep:'', cookLabel:'Kochen',
+           cook:'', difficulty:'Leicht', servings:4, servingsLabel:'Portionen',
+           ingredients:[{a:null,u:'g',n:''}], steps:[''],
+           tip:'', nutriManual:null, log:[] };
+}
+function editRecipe(id, preset){
+  const src = id ? S.recipes.find(r=>r.id===id) : null;
+  draft = src ? JSON.parse(JSON.stringify(src)) : Object.assign(blankRecipe(), preset||{});
+  if(!draft.ingredients.length) draft.ingredients=[{a:null,u:'g',n:''}];
+  if(!draft.steps.length) draft.steps=[''];
+  openModal(id?'Rezept bearbeiten':'Neues Rezept', editorHTML(),
+    ['<button class="btn primary" id="eSave">Speichern</button>',
+     '<button class="btn ghost" id="eCancel">Abbrechen</button>'],
+    m => bindEditor(m));
+}
+function editorHTML(){
+  const d = draft;
+  const unitOpts = u => UNITS.map(x=>'<option '+(u===x.u?'selected':'')+'>'+x.u+'</option>').join('');
+  return ''+
+  '<div class="row" style="align-items:flex-start;gap:16px">'+
+    '<label class="field" style="flex:2;min-width:220px"><span>Titel</span>'+
+      '<input type="text" id="fTitle" value="'+esc(d.title)+'" placeholder="z. B. Kaiserschmarrn"></label>'+
+    '<label class="field" style="flex:1;min-width:150px"><span>Kapitel</span><select id="fChapter">'+
+      CHAPTERS.map(c=>'<option value="'+c.id+'" '+(d.chapter===c.id?'selected':'')+'>'+
+        esc(c.one)+'</option>').join('')+'</select></label>'+
+  '</div>'+
+  '<label class="field"><span>Tags — durch Komma getrennt</span>'+
+    '<input type="text" id="fTags" value="'+esc((d.tags||[]).join(', '))+
+    '" list="tagList" placeholder="Italienisch, Vegetarisch">'+
+    '<datalist id="tagList">'+TAG_SUGGESTIONS.map(t=>'<option value="'+esc(t)+'">').join('')+
+    '</datalist><p class="hint">Höchstens '+MAX_TAGS+' Tags – Land, Ernährungsform, '+
+      'Eigenschaft. Mehr macht Karte und Buchseite unruhig.</p></label>'+
+  '<div class="row" style="gap:14px">'+
+    '<label class="field" style="flex:1;min-width:120px"><span>Vorbereitung</span>'+
+      '<input type="text" id="fPrep" value="'+esc(d.prep)+'" placeholder="20 Min"></label>'+
+    '<label class="field" style="flex:1;min-width:120px"><span>Zweite Zeitangabe</span>'+
+      '<select id="fCookLabel">'+['Kochen','Backen','Braten','Garen','Kühlen','Ziehen']
+        .map(x=>'<option '+(d.cookLabel===x?'selected':'')+'>'+x+'</option>').join('')+
+      '</select></label>'+
+    '<label class="field" style="flex:1;min-width:110px"><span>Dauer</span>'+
+      '<input type="text" id="fCook" value="'+esc(d.cook)+'" placeholder="30 Min"></label>'+
+    '<label class="field" style="flex:1;min-width:120px"><span>Schwierigkeit</span>'+
+      '<select id="fDiff">'+['Leicht','Mittel','Anspruchsvoll']
+        .map(x=>'<option '+(d.difficulty===x?'selected':'')+'>'+x+'</option>').join('')+
+      '</select></label>'+
+  '</div>'+
+  '<div class="row" style="gap:14px">'+
+    '<label class="field" style="width:110px"><span>Ergibt</span>'+
+      '<input type="number" id="fServ" min="1" step="1" value="'+yieldOf(d)+'"></label>'+
+    '<label class="field" style="flex:1;min-width:150px"><span>Einheit der Menge</span>'+
+      '<input type="text" id="fServL" list="servList" value="'+esc(yieldLabel(d))+'">'+
+      '<datalist id="servList">'+['Portionen','Stück','Gläser','Bowls','Wraps','Brot',
+        'Blech','Liter'].map(x=>'<option value="'+x+'">').join('')+'</datalist></label>'+
+  '</div>'+
+  '<div class="field"><span>Zutaten für '+yieldOf(d)+' '+esc(yieldLabel(d))+
+    '</span><div id="ingList">'+
+    d.ingredients.map((i,k)=>
+      '<div class="ing-row" data-k="'+k+'">'+
+        '<input type="text" class="ia" value="'+(i.a==null?'':num(i.a))+'" placeholder="Menge">'+
+        '<select class="iu">'+unitOpts(i.u)+'</select>'+
+        '<input type="text" class="in" value="'+esc(i.n)+'" placeholder="Zutat">'+
+        '<button class="icon-btn" data-del-i="'+k+'">×</button></div>').join('')+
+    '</div><button class="btn sm" id="addIng" style="margin-top:6px">+ Zutat</button></div>'+
+  '<div class="field"><span>Zubereitung</span><div id="stepList">'+
+    d.steps.map((s,k)=>
+      '<div class="step-row" data-k="'+k+'"><div class="no">'+(k+1)+'</div>'+
+        '<textarea class="st" rows="2" placeholder="Arbeitsschritt">'+esc(s)+'</textarea>'+
+        '<button class="icon-btn" data-del-s="'+k+'">×</button></div>').join('')+
+    '</div><button class="btn sm" id="addStep" style="margin-top:6px">+ Schritt</button></div>'+
+  '<label class="field"><span>Tipp (optional)</span>'+
+    '<input type="text" id="fTip" value="'+esc(d.tip||'')+'"></label>'+
+  '<div class="field"><span>Nährwerte pro Portion</span><div id="nutriBox"></div>'+
+    '<div class="row" style="margin-top:9px">'+
+      '<button class="btn sm" id="nRecalc">Neu schätzen</button>'+
+      '<button class="btn sm" id="nManual">Selbst eintragen</button></div></div>';
+}
+function readEditor(m){
+  const d = draft;
+  d.title = m.querySelector('#fTitle').value.trim();
+  d.chapter = m.querySelector('#fChapter').value;
+  d.tags = m.querySelector('#fTags').value.split(',').map(s=>s.trim())
+             .filter(Boolean).slice(0, MAX_TAGS);
+  d.prep = m.querySelector('#fPrep').value.trim();
+  d.cookLabel = m.querySelector('#fCookLabel').value;
+  d.cook = m.querySelector('#fCook').value.trim();
+  d.difficulty = m.querySelector('#fDiff').value;
+  d.servings = Math.max(1, +m.querySelector('#fServ').value || 4);
+  d.servingsLabel = m.querySelector('#fServL').value.trim() || 'Portionen';
+  d.tip = m.querySelector('#fTip').value.trim();
+  d.ingredients = Array.from(m.querySelectorAll('#ingList .ing-row')).map(row=>{
+    const raw = row.querySelector('.ia').value.trim().replace(',', '.')
+      .replace('½','.5').replace('¼','.25').replace('¾','.75');
+    return { a: raw==='' ? null : parseFloat(raw),
+             u: row.querySelector('.iu').value,
+             n: row.querySelector('.in').value.trim() };
+  }).filter(i=>i.n);
+  d.steps = Array.from(m.querySelectorAll('#stepList .st'))
+    .map(t=>t.value.trim()).filter(Boolean);
+}
+function paintNutri(m){
+  const n = nutriOf(draft), manual = !!draft.nutriManual;
+  m.querySelector('#nutriBox').innerHTML =
+    '<div class="nutri-preview">'+
+      [['kcal',n.kcal],['Eiweiß',n.protein+' g'],['Fett',n.fat+' g'],
+       ['Kohlenh.',n.carbs+' g']].map(x=>'<div><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('')+
+    '</div>'+
+    '<p class="hint">'+(manual ? 'Von Hand eingetragen.'
+      : 'Geschätzt aus den Zutaten. Werte sind Richtwerte, keine Laboranalyse.')+'</p>'+
+    (!manual && n.unknown && n.unknown.length ?
+      '<div class="warn">Nicht in der Nährwerttabelle gefunden und daher nicht mitgerechnet: '+
+      esc(n.unknown.join(', '))+'. Trag die Werte bei Bedarf von Hand ein.</div>' : '');
+}
+function bindEditor(m){
+  paintNutri(m);
+  const refresh = () => { readEditor(m);
+    m.querySelector('.modal-body').innerHTML = editorHTML(); bindEditor(m); };
+  m.querySelector('#addIng').onclick = () => { readEditor(m);
+    draft.ingredients.push({a:null,u:'g',n:''});
+    m.querySelector('.modal-body').innerHTML = editorHTML(); bindEditor(m); };
+  m.querySelector('#addStep').onclick = () => { readEditor(m); draft.steps.push('');
+    m.querySelector('.modal-body').innerHTML = editorHTML(); bindEditor(m); };
+  m.querySelector('#ingList').onclick = e => { const b=e.target.closest('[data-del-i]');
+    if(!b) return; readEditor(m); draft.ingredients.splice(+b.dataset.delI,1);
+    if(!draft.ingredients.length) draft.ingredients=[{a:null,u:'g',n:''}];
+    m.querySelector('.modal-body').innerHTML = editorHTML(); bindEditor(m); };
+  m.querySelector('#stepList').onclick = e => { const b=e.target.closest('[data-del-s]');
+    if(!b) return; readEditor(m); draft.steps.splice(+b.dataset.delS,1);
+    if(!draft.steps.length) draft.steps=[''];
+    m.querySelector('.modal-body').innerHTML = editorHTML(); bindEditor(m); };
+  m.querySelectorAll('#ingList input, #ingList select').forEach(el=>
+    el.onchange = () => { readEditor(m); draft.nutriManual=null; paintNutri(m); });
+  m.querySelector('#nRecalc').onclick = () => { readEditor(m); draft.nutriManual=null;
+    paintNutri(m); toast('Nährwerte neu geschätzt.'); };
+  m.querySelector('#nManual').onclick = () => { readEditor(m); manualNutri(m); };
+  m.querySelector('#eCancel').onclick = closeModal;
+  m.querySelector('#eSave').onclick = () => {
+    readEditor(m);
+    if(!draft.title){ toast('Bitte einen Titel eintragen.'); return; }
+    if(draft.id){ const i=S.recipes.findIndex(r=>r.id===draft.id); S.recipes[i]=draft; }
+    else { draft.id = uid(); draft.createdAt = Date.now(); S.recipes.push(draft); }
+    save(); closeModal(); render(); toast('Rezept gespeichert.');
+  };
+}
+function manualNutri(m){
+  const n = nutriOf(draft);
+  const f = (id,l,v) => '<label class="field" style="flex:1;min-width:110px"><span>'+l+
+    '</span><input type="number" id="'+id+'" value="'+v+'"></label>';
+  openModal('Nährwerte pro Portion',
+    '<div class="row" style="gap:12px">'+f('mK','kcal',n.kcal)+f('mP','Eiweiß g',n.protein)+
+    f('mF','Fett g',n.fat)+f('mC','Kohlenhydrate g',n.carbs)+'</div>'+
+    '<p class="hint">Gilt für eine Portion – das Rezept ergibt '+yieldOf(draft)+
+      ' '+esc(yieldLabel(draft))+'.</p>',
+    ['<button class="btn primary" id="mOk">Übernehmen</button>',
+     '<button class="btn ghost" id="mAuto">Doch schätzen lassen</button>'],
+    mm => {
+      mm.querySelector('#mOk').onclick = () => {
+        draft.nutriManual = { kcal:+mm.querySelector('#mK').value,
+          protein:+mm.querySelector('#mP').value, fat:+mm.querySelector('#mF').value,
+          carbs:+mm.querySelector('#mC').value };
+        reopenEditor();
+      };
+      mm.querySelector('#mAuto').onclick = () => { draft.nutriManual=null; reopenEditor(); };
+    }, true);
+}
+function reopenEditor(){
+  closeModal();
+  openModal(draft.id?'Rezept bearbeiten':'Neues Rezept', editorHTML(),
+    ['<button class="btn primary" id="eSave">Speichern</button>',
+     '<button class="btn ghost" id="eCancel">Abbrechen</button>'], m=>bindEditor(m));
+}
+
+/* ------------------------- PDF einlesen --------------------------------- */
+/* Liest den Text direkt aus der PDF-Datei. Funktioniert bei PDFs mit echtem
+   Text (aus Word, aus dem Netz, aus Kochbuch-Apps). Eingescannte Seiten sind
+   nur Bilder – da findet die App keinen Text und sagt das auch. */
+
+async function inflate(bytes){
+  if(typeof DecompressionStream === 'undefined') return null;
+  for(const fmt of ['deflate','deflate-raw']){
+    try{
+      const ds = new DecompressionStream(fmt);
+      const st = new Blob([bytes]).stream().pipeThrough(ds);
+      return new Uint8Array(await new Response(st).arrayBuffer());
+    }catch(e){ /* nächstes Format versuchen */ }
+  }
+  return null;
+}
+const bytesToLatin = b => { let s=''; const N=8192;
+  for(let i=0;i<b.length;i+=N) s += String.fromCharCode.apply(null, b.subarray(i,i+N));
+  return s; };
+
+function readLiteral(s, i){          /* ( … ) inklusive Escapes */
+  let out='', depth=0; i++;
+  while(i < s.length){
+    const c = s[i];
+    if(c === '\\'){
+      const nx = s[i+1];
+      const oct = /^[0-7]{1,3}/.exec(s.slice(i+1,i+4));
+      if(oct){ out += String.fromCharCode(parseInt(oct[0],8)); i += 1+oct[0].length; continue; }
+      out += ({'n':'\n','r':'\r','t':'\t','b':'','f':''}[nx] !== undefined
+              ? ({'n':'\n','r':'\r','t':'\t','b':'','f':''}[nx]) : nx);
+      i += 2; continue;
+    }
+    if(c === '('){ depth++; out += c; i++; continue; }
+    if(c === ')'){ if(!depth) return [out, i+1]; depth--; out += c; i++; continue; }
+    out += c; i++;
+  }
+  return [out, i];
+}
+/* Zielwerte einer CMap sind immer UTF-16BE */
+function hexToUnicode(h){
+  const c = h.replace(/\s+/g,'');
+  if(c.length % 4 === 0){
+    let out='';
+    for(let i=0;i<c.length;i+=4) out += String.fromCharCode(parseInt(c.substr(i,4),16));
+    return out;
+  }
+  return hexString(c);
+}
+function hexString(h){
+  const clean = h.replace(/\s+/g,'');
+  if(/^FEFF/i.test(clean)){          /* UTF-16BE */
+    let out='';
+    for(let i=4;i+3<clean.length+1;i+=4) out += String.fromCharCode(parseInt(clean.substr(i,4),16));
+    return out;
+  }
+  let out='';
+  for(let i=0;i+1<clean.length+1;i+=2) out += String.fromCharCode(parseInt(clean.substr(i,2),16));
+  return out;
+}
+/* Viele PDFs benutzen eingebettete Teil-Schriften mit eigenen Zeichencodes.
+   Die Übersetzungstabelle dazu steht als CMap im Dokument (beginbfchar /
+   beginbfrange). Ohne sie käme nur Buchstabensalat heraus. */
+function parseCMap(c, map){
+  let m, re;
+  re = /beginbfchar([\s\S]*?)endbfchar/g;
+  while((m = re.exec(c))){
+    const rr = /<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>/g; let x;
+    while((x = rr.exec(m[1]))){
+      if(x[1].length >= 4) map.__two = true;
+      map[parseInt(x[1],16)] = hexToUnicode(x[2]);
+    }
+  }
+  re = /beginbfrange([\s\S]*?)endbfrange/g;
+  while((m = re.exec(re.lastIndex!==undefined?c:c))){
+    const body = m[1];
+    const rr = /<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>\s*(<([0-9A-Fa-f]+)>|\[([\s\S]*?)\])/g;
+    let x;
+    while((x = rr.exec(body))){
+      const lo = parseInt(x[1],16), hi = parseInt(x[2],16);
+      if(x[1].length >= 4) map.__two = true;
+      if(x[4]){
+        const base = parseInt(x[4],16);
+        for(let k=lo;k<=hi && k-lo<4096;k++) map[k] = String.fromCharCode(base + (k-lo));
+      } else {
+        const items = x[5].match(/<([0-9A-Fa-f]+)>/g) || [];
+        items.forEach((it,k)=>{ map[lo+k] = hexToUnicode(it.slice(1,-1)); });
+      }
+    }
+  }
+  return map;
+}
+const badChar = v => v === undefined || v === '' || v === '\u0000';
+function decodeStr(str, map, twoByte){
+  if(!map) return str;
+  const fb = map.__fb;
+  let out = '';
+  if(twoByte){
+    for(let i=0;i+1<str.length;i+=2){
+      const code = (str.charCodeAt(i)<<8) | str.charCodeAt(i+1);
+      let v = map[code];
+      if(badChar(v) && fb) v = fb[code];
+      out += badChar(v) ? ' ' : v;
+    }
+  } else {
+    for(let i=0;i<str.length;i++){
+      const code = str.charCodeAt(i);
+      let v = map[code];
+      if(badChar(v) && fb) v = fb[code];
+      out += badChar(v) ? (code < 32 ? '' : str[i]) : v;
+    }
+  }
+  return out;
+}
+/* Ein Inhaltsstrom wird in positionierte Textstücke zerlegt. Manche PDFs
+   setzen jeden Buchstaben einzeln – ohne Koordinaten käme dabei nur
+   Buchstabensalat heraus. */
+function tokenizeContent(c){
+  const items = [];
+  let i = 0, ops = [], pending = [], inArr = false;
+  let font = '', size = 10, scale = 1, lead = 0, charSp = 0, wordSp = 0;
+  let lx = 0, ly = 0, tx = 0, ty = 0, idx = 0;
+
+  const flush = () => {
+    if(pending.length){
+      items.push({ x:tx, y:ty, size:size*scale, font:font, parts:pending,
+                   cs:charSp*scale, ws:wordSp*scale, i:idx++ });
+      pending = [];
+    }
+  };
+  while(i < c.length){
+    const ch = c[i];
+    if(ch === '('){ const r = readLiteral(c,i); pending.push(r[0]); i = r[1]; continue; }
+    if(ch === '<' && c[i+1] !== '<'){
+      const e = c.indexOf('>', i); if(e < 0) break;
+      pending.push(hexString(c.slice(i+1,e))); i = e+1; continue;
+    }
+    if(ch === '['){ inArr = true; i++; continue; }
+    if(ch === ']'){ inArr = false; i++; continue; }
+    if(ch === '/'){
+      const m = /^\/([^\s/\[\]()<>]+)/.exec(c.slice(i));
+      if(m){ ops.push({name:m[1]}); i += m[0].length; continue; }
+    }
+    if(/[-+.\d]/.test(ch)){
+      const m = /^[-+]?\d*\.?\d+/.exec(c.slice(i));
+      if(m){
+        const v = parseFloat(m[0]);
+        if(inArr){ if(v < -120) pending.push(null); }   /* null = Wortlücke,
+           kein Leerzeichen: in Teil-Schriften ist 0x20 oft ein echter Buchstabe */
+        else ops.push(v);
+        i += m[0].length; continue;
+      }
+    }
+    const om = /^(T\*|BT|ET|Tf|Tm|Td|TD|TL|Tj|TJ|Tc|Tw|Tz|Ts|Tr|cm|q|Q|'|")/.exec(c.slice(i));
+    if(om){
+      const op = om[0], n = ops.filter(x=>typeof x === 'number');
+      if(op === 'Tf'){
+        const f = ops.find(x=>x && x.name); if(f) font = f.name;
+        if(n.length) size = n[n.length-1];
+      } else if(op === 'Tm' && n.length >= 6){
+        const a = n.slice(-6);
+        scale = Math.sqrt(Math.abs(a[0]*a[3] - a[1]*a[2])) || 1;
+        lx = a[4]; ly = a[5]; tx = lx; ty = ly;
+      } else if((op === 'Td' || op === 'TD') && n.length >= 2){
+        const a = n.slice(-2);
+        if(op === 'TD') lead = -a[1];
+        lx += a[0]; ly += a[1]; tx = lx; ty = ly;
+      } else if(op === 'TL' && n.length){ lead = n[n.length-1];
+      } else if(op === 'Tc' && n.length){ charSp = n[n.length-1];
+      } else if(op === 'Tw' && n.length){ wordSp = n[n.length-1];
+      } else if(op === 'T*'){ ly -= lead; tx = lx; ty = ly;
+      } else if(op === 'BT'){ lx = ly = tx = ty = 0;
+      } else if(op === 'Tj' || op === 'TJ'){ flush();
+      } else if(op === "'" || op === '"'){ ly -= lead; tx = lx; ty = ly; flush(); }
+      ops = []; i += op.length; continue;
+    }
+    const w = /^[A-Za-z*'"]+/.exec(c.slice(i));
+    if(w){ ops = []; i += w[0].length; continue; }
+    i++;
+  }
+  flush();
+  return items;
+}
+
+/* Wie gut passt eine Zeichentabelle zu den Zeichen dieser Schrift? */
+function coverage(map, strs){
+  const two = !!map.__two;
+  let hit=0, all=0;
+  for(const v of strs){
+    if(two){ for(let i=0;i+1<v.length;i+=2){ all++;
+      if(map[(v.charCodeAt(i)<<8)|v.charCodeAt(i+1)] !== undefined) hit++; } }
+    else { for(let i=0;i<v.length;i++){ all++;
+      if(map[v.charCodeAt(i)] !== undefined) hit++; } }
+  }
+  return all ? hit/all : 0;
+}
+/* Ungefähre Buchstabenbreiten (Helvetica-Maße, in em). Ohne sie hält die App
+   den Abstand hinter einem breiten „m“ für ein Leerzeichen. */
+const CW = {' ':.278,'!':.278,'"':.355,'#':.556,'$':.556,'%':.889,'&':.667,"'":.191,
+ '(':.333,')':.333,'*':.389,'+':.584,',':.278,'-':.333,'.':.278,'/':.278,':':.278,
+ ';':.278,'<':.584,'=':.584,'>':.584,'?':.556,'@':1.015,'[':.278,']':.278,'_':.556,
+ '`':.333,'{':.334,'|':.26,'}':.334,'·':.333,'–':.556,'—':1,'’':.191,'„':.333,'“':.333,
+ 'a':.556,'b':.556,'c':.5,'d':.556,'e':.556,'f':.278,'g':.556,'h':.556,'i':.222,
+ 'j':.222,'k':.5,'l':.222,'m':.833,'n':.556,'o':.556,'p':.556,'q':.556,'r':.333,
+ 's':.5,'t':.278,'u':.556,'v':.5,'w':.722,'x':.5,'y':.5,'z':.5,'ß':.611,
+ 'A':.667,'B':.667,'C':.722,'D':.722,'E':.667,'F':.611,'G':.778,'H':.722,'I':.278,
+ 'J':.5,'K':.667,'L':.556,'M':.833,'N':.722,'O':.778,'P':.667,'Q':.778,'R':.722,
+ 'S':.667,'T':.611,'U':.722,'V':.667,'W':.944,'X':.667,'Y':.667,'Z':.611};
+const UML = {'ä':'a','ö':'o','ü':'u','Ä':'A','Ö':'O','Ü':'U','é':'e','è':'e','à':'a',
+  'ﬁ':'fi','ﬂ':'fl'};
+function textWidth(t, size){
+  let w = 0;
+  for(const ch of String(t||'')){
+    const c = UML[ch] || ch;
+    if(c.length > 1){ w += textWidth(c, 1); continue; }
+    w += (CW[c] !== undefined) ? CW[c] : (/[0-9]/.test(c) ? .556 : .55);
+  }
+  return w * size;
+}
+const median = a => { if(!a.length) return 0;
+  const b = a.slice().sort((x,y)=>x-y); return b[Math.floor(b.length/2)]; };
+
+/* Textstücke zu Zeilen bündeln: gleiche Höhe = eine Zeile, Lücken = Leerzeichen */
+function itemsToLines(items, cmaps, byName){
+  if(!items.length) return [];
+  const byFont = {};
+  items.forEach(it=>{
+    const raw = it.parts.filter(x=> x !== null);
+    if(raw.length) (byFont[it.font] = byFont[it.font] || []).push.apply(byFont[it.font], raw);
+  });
+  const chosen = {};
+  for(const f in byFont){
+    /* Erst unter den Tabellen suchen, die das PDF dieser Schrift zuordnet.
+       Nur wenn es keine gibt, alle durchprobieren. */
+    const cands = (byName && byName[f] && byName[f].length) ? byName[f] : cmaps;
+    let best = null, score = (cands === cmaps) ? 0.35 : -1;
+    for(const cm of cands){ const sc = coverage(cm, byFont[f]); if(sc > score){ score = sc; best = cm; } }
+    chosen[f] = best;
+  }
+  items.forEach(it=>{
+    const cm = chosen[it.font];
+    it.text = it.parts.map(x=> x === null ? ' '
+      : (cm ? decodeStr(x, cm, !!cm.__two) : x)).join('');
+  });
+
+  /* Läuft y nach unten oder nach oben? Die Reihenfolge im Datenstrom verrät es. */
+  let down = 1, bestCorr = -2;
+  [1,-1].forEach(dir=>{
+    const sorted = items.slice().sort((a,b)=> dir*(a.y-b.y) || a.x-b.x);
+    let inv = 0;
+    for(let k=1;k<sorted.length;k++) if(sorted[k].i < sorted[k-1].i) inv++;
+    const corr = 1 - 2*inv/Math.max(1,sorted.length-1);
+    if(corr > bestCorr){ bestCorr = corr; down = dir; }
+  });
+
+  const sorted = items.slice().sort((a,b)=> down*(a.y-b.y) || a.x-b.x);
+  const tol = Math.max(1.2, median(items.map(x=>x.size)) * 0.5);
+  const lines = [];
+  let cur = null;
+  for(const it of sorted){
+    if(!cur || Math.abs(it.y - cur.y0) > tol){
+      cur = { y0:it.y, y:down*it.y, size:it.size, items:[it] };
+      lines.push(cur);
+    } else cur.items.push(it);
+  }
+  return lines.map(l=>{
+    l.items.sort((a,b)=>a.x-b.x);
+    let text = '', endX = null;
+    for(const it of l.items){
+      if(endX !== null && it.x - endX > it.size*0.34 && !/\s$/.test(text)) text += ' ';
+      text += it.text;
+      endX = it.x + textWidth(it.text, it.size) +
+             (it.cs||0) * (it.text ? it.text.length : 1) +
+             (it.ws||0) * ((it.text||'').split(' ').length - 1);
+    }
+    l.text = text.replace(/\s+/g,' ').trim();
+    l.x = l.items[0].x;
+    l.endX = endX;
+    l.size = median(l.items.map(x=>x.size));
+    return l;
+  }).filter(l=>l.text);
+}
+
+/* Lesereihenfolge bei mehrspaltigen Seiten: abwechselnd waagrecht und
+   senkrecht schneiden, wie man es mit einer Schere täte. */
+function xyCut(lines, depth){
+  depth = depth || 0;
+  if(lines.length <= 1 || depth > 7) return lines.slice().sort((a,b)=>a.y-b.y || a.x-b.x);
+  const byY = lines.slice().sort((a,b)=>a.y-b.y);
+  const medH = median(byY.map(l=>l.size)) || 10;
+  const bands = [[byY[0]]];
+  for(let i=1;i<byY.length;i++){
+    if(byY[i].y - byY[i-1].y > medH*2.0) bands.push([byY[i]]);
+    else bands[bands.length-1].push(byY[i]);
+  }
+  if(bands.length > 1){
+    let out = [];
+    bands.forEach(b=> out = out.concat(xyCut(b, depth+1)));
+    return out;
+  }
+  const cols = splitColumns(lines);
+  if(cols){
+    let out = [];
+    cols.forEach(cl=> out = out.concat(xyCut(cl, depth+1)));
+    return out;
+  }
+  return byY;
+}
+function splitColumns(lines){
+  if(lines.length < 4) return null;
+  /* Die Lücke zwischen zwei Spalten findet man nur an den einzelnen Textstücken.
+     Auf Zeilenebene ist sie zugedeckt, weil eine Zeile links beginnt und rechts
+     endet – dazwischen steht aber nichts. */
+  const parts = [];
+  lines.forEach(l => l.items.forEach(it=>{
+    parts.push({ a: it.x, b: it.x + textWidth(it.text, it.size) });
+  }));
+  if(parts.length < 8) return null;
+  const x0 = Math.min.apply(null, parts.map(p=>p.a));
+  const x1 = Math.max.apply(null, parts.map(p=>p.b));
+  const width = x1 - x0;
+  if(width <= 0) return null;
+  const N = 240, bins = new Array(N).fill(0);
+  parts.forEach(p=>{
+    const a = Math.max(0, Math.floor((p.a - x0)/width*N));
+    const b = Math.min(N-1, Math.ceil((p.b - x0)/width*N));
+    for(let k=a;k<=b;k++) bins[k] = 1;
+  });
+  let best = null, run = 0;
+  const consider = (a,b) => {
+    const w = b-a+1;
+    if(a <= 2 || b >= N-3) return;             /* Rand zählt nicht */
+    if(w < N*0.05) return;                     /* zu schmal für eine echte Spalte */
+    if(!best || w > best.w) best = { a:a, b:b, w:w };
+  };
+  for(let k=0;k<N;k++){
+    if(!bins[k]) run++;
+    else { if(run > 0) consider(k-run, k-1); run = 0; }
+  }
+  if(run > 0) consider(N-run, N-1);
+  if(!best) return null;
+  const cutX = x0 + ((best.a + best.b)/2) / N * width;
+
+  /* Zeilen, die über die Lücke reichen, werden an ihr zerschnitten */
+  const left = [], right = [];
+  lines.forEach(l=>{
+    const a = l.items.filter(it=>it.x < cutX), b = l.items.filter(it=>it.x >= cutX);
+    if(a.length) left.push(rebuildLine(l, a));
+    if(b.length) right.push(rebuildLine(l, b));
+  });
+  if(left.length < 2 || right.length < 2) return null;
+  const share = right.length / (left.length + right.length);
+  if(share < 0.12 || share > 0.88) return null;   /* nur ein Ausreißer, keine Spalte */
+  /* Eine echte Spalte hat Breite. Sonst trennt man nur die Mengenangaben von
+     den Zutatennamen – und reißt zusammengehörende Zeilen auseinander. */
+  const spanOf = ls => Math.max.apply(null, ls.map(l=>l.endX)) -
+                       Math.min.apply(null, ls.map(l=>l.x));
+  if(spanOf(left) < width*0.2 || spanOf(right) < width*0.2) return null;
+  return [left, right];
+}
+/* Aus einer Teilmenge von Textstücken wieder eine Zeile bauen */
+function rebuildLine(src, items){
+  items = items.slice().sort((a,b)=>a.x-b.x);
+  let text = '', endX = null;
+  for(const it of items){
+    if(endX !== null && it.x - endX > it.size*0.34 && !/\s$/.test(text)) text += ' ';
+    text += it.text;
+    endX = it.x + textWidth(it.text, it.size) +
+           (it.cs||0) * (it.text ? it.text.length : 1) +
+           (it.ws||0) * ((it.text||'').split(' ').length - 1);
+  }
+  return { y0:src.y0, y:src.y, size:median(items.map(x=>x.size)), items:items,
+           text:text.replace(/\s+/g,' ').trim(), x:items[0].x, endX:endX };
+}
+
+/* Bleibt als einfacher Einstieg erhalten */
+function contentToText(c, map, twoByte){
+  const cm = map ? [Object.assign({__two:twoByte}, map)] : [];
+  return xyCut(itemsToLines(tokenizeContent(c), cm, null)).map(l=>l.text).join('\n');
+}
+
+/* Im PDF steht schwarz auf weiß, welche Schrift welche Zeichentabelle benutzt:
+   /Resources /Font << /F4 4 0 R >> und im Font-Objekt /ToUnicode 52 0 R.
+   Das ist verlässlicher als jedes Raten. */
+/* Manche PDFs lassen für einzelne Zeichen die Zuordnung offen – dann steht
+   dort nichts oder ein Nullzeichen. Weil alle Teil-Schriften eines Dokuments
+   in der Regel dieselben Zeichencodes benutzen, hilft eine gemeinsame Tabelle
+   aus allen Schriften als Rückfallebene. */
+function buildFallback(cmaps){
+  const votes = { one:{}, two:{} };
+  cmaps.forEach(cm=>{
+    const bucket = cm.__two ? votes.two : votes.one;
+    for(const k in cm){
+      if(k === '__two' || k === '__fb') continue;
+      const v = cm[k];
+      if(v === undefined || v === '' || v === '\u0000') continue;
+      (bucket[k] = bucket[k] || {})[v] = (bucket[k][v] || 0) + 1;
+    }
+  });
+  const pick = b => {
+    const out = {};
+    for(const k in b){
+      out[k] = Object.keys(b[k]).sort((x,y)=> b[k][y]-b[k][x] || x.localeCompare(y))[0];
+    }
+    return out;
+  };
+  const fb = { one:pick(votes.one), two:pick(votes.two) };
+  cmaps.forEach(cm=>{ cm.__fb = cm.__two ? fb.two : fb.one; });
+  return fb;
+}
+
+function fontNameMap(raw, byObj){
+  const fontToUni = {};
+  const re = /\/ToUnicode\s+(\d+)\s+0\s+R/g; let m;
+  while((m = re.exec(raw))){
+    const before = raw.lastIndexOf(' obj', m.index);
+    if(before < 0) continue;
+    const on = /(\d+)\s+0\s+obj\s*$/.exec(raw.slice(Math.max(0,before-24), before+4));
+    if(on) fontToUni[on[1]] = m[1];
+  }
+  /* Ein Dokument kann denselben Namen (z. B. /F7) auf mehreren Seiten für
+     verschiedene Teil-Schriften benutzen. Deshalb alle Kandidaten sammeln und
+     später die passende auswählen. */
+  const byName = {};
+  const rf = /\/Font\s*<<([\s\S]{0,4000}?)>>/g;
+  while((m = rf.exec(raw))){
+    const rr = /\/([^\s/<>\[\]]+)\s+(\d+)\s+0\s+R/g; let x;
+    while((x = rr.exec(m[1]))){
+      const uni = fontToUni[x[2]];
+      if(uni && byObj[uni]){
+        const list = byName[x[1]] = byName[x[1]] || [];
+        if(list.indexOf(byObj[uni]) < 0) list.push(byObj[uni]);
+      }
+    }
+  }
+  return byName;
+}
+
+async function pdfToText(buffer){
+  const bytes = new Uint8Array(buffer);
+  const raw = bytesToLatin(bytes);
+  const contents = [], cmaps = [], byObj = {};
+  const re = /stream\r?\n?/g; let m;
+  while((m = re.exec(raw))){
+    const start = m.index + m[0].length;
+    let end = raw.indexOf('endstream', start);
+    if(end < 0) break;
+    re.lastIndex = end + 9;              /* sofort weiterspringen, sonst verirrt sich
+                                            die Suche in den Binärdaten */
+    /* nur den Kopf des aktuellen Objekts betrachten – sonst schwappen die
+       Angaben des vorherigen Objekts herein */
+    const ctx = raw.slice(Math.max(0, m.index-600), m.index);
+    const oi = ctx.lastIndexOf(' obj');
+    const dict = oi >= 0 ? ctx.slice(oi+4) : ctx.slice(-140);
+    if(/\/Image|\/DCTDecode|\/JPXDecode|\/OpenType|\/FontFile/.test(dict)) continue;
+    while(end > start && (raw[end-1] === '\n' || raw[end-1] === '\r')) end--;
+    const len = /\/Length\s+(\d+)[\s\/>]/.exec(dict);
+    if(len && start + (+len[1]) <= end + 2) end = start + (+len[1]);
+    let data = bytes.subarray(start, end);
+    if(/\/FlateDecode/.test(dict)){
+      const inf = await inflate(data);
+      if(!inf) continue;
+      data = inf;
+    }
+    const content = bytesToLatin(data);
+    if(/beginbf(char|range)/.test(content)){
+      const cm = parseCMap(content, {});
+      /* auch winzige Tabellen zählen – manche Schriften enthalten nur ein
+         einziges Zeichen, etwa ein „ß“ oder eine Ligatur */
+      if(Object.keys(cm).some(k => k !== '__two')){
+        cmaps.push(cm);
+        const on = /(\d+)\s+0\s+obj\s*$/.exec(ctx.slice(0, oi+4));
+        if(on) byObj[on[1]] = cm;
+      }
+      continue;
+    }
+    if(/(Tj|TJ)/.test(content)) contents.push(content);
+  }
+  /* Bewusst keine gemeinsame Rückfalltabelle: erfundene Buchstaben sind
+     schlimmer als eine Lücke, die man im Zuordnungsschritt sieht. */
+  const byName = fontNameMap(raw, byObj);
+  const text = contents.map(c =>
+    xyCut(itemsToLines(tokenizeContent(c), cmaps, byName)).map(l=>l.text).join('\n')
+  ).join('\n');
+  return text.replace(/\u0000/g,'').replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n')
+             .split('\n').map(l=>l.trim()).join('\n').trim();
+}
+
+/* =========================================================================
+   Zuordnen: Kein Erkenner trifft jedes PDF-Layout. Statt zu raten zeigt die
+   App, was sie gelesen hat, schlägt eine Einteilung vor – und du korrigierst
+   sie mit einem Fingertipp.
+   ========================================================================= */
+let asgLines = [];
+
+/* Vorschlag, welche Zeile was ist */
+function preClassify(lines){
+  const out = [];
+  let titleDone = false, seenIng = false, seenStep = false;
+  const isUpper = l => l === l.toUpperCase() && /[A-ZÄÖÜ]/.test(l);
+  for(const raw of lines){
+    const l = raw.trim();
+    if(!l) continue;
+    let role = 'x';
+    const amount = /^(\d+[.,]?\d*|[½¼¾⅓⅔]|etwas|n\.\s?B\.)(\s|$)/i.test(l);
+    const longish = l.length > 55;
+    const stepNo  = /^\d{1,2}\s+\S/.test(l) && l.length > 25;
+
+    const nutriLine = /\bkcal\b/i.test(l) || /ballaststoff/i.test(l)
+      || /^(eiweiss|eiweiß|kohlenhydrate|fett)\b/i.test(l)
+      || /^\s*\d+([.,]\d+)?(\s+\d+([.,]\d+)?\s*g\b){2,}/.test(l)
+      || /^gesamt\b/i.test(l) || /schätzwerte/i.test(l)
+      || /^pro\s+\w+/i.test(l);          /* „pro Wrap“, „pro Portion“ */
+    if(/^(min|std|gesamt|kcal|eiweiss|eiweiß|fett|kohlenhydrate|ballaststoffe)$/i.test(l)
+       || /^~?\d+\s*(min|g|kcal)$/i.test(l) || l.length < 3 || nutriLine) role = 'x';
+    else if(!titleDone && !isUpper(l) && l.length > 3 && l.length < 70 && !amount){
+      role = 't'; titleDone = true;
+    }
+    else if(isUpper(l) && l.length < 40) role = 'x';           /* Rubriküberschrift */
+    else if(stepNo || (longish && (seenIng || seenStep))){ role = 's'; seenStep = true; }
+    else if(amount && l.length < 60 && !seenStep){ role = 'z'; seenIng = true; }
+    else if(longish){ role = 's'; seenStep = true; }
+    else if(seenStep) role = 's';
+    else role = 'x';
+    out.push({ text:l, role:role });
+  }
+  return out;
+}
+function openAssign(text, backTo){
+  asgLines = preClassify(String(text||'').split('\n'));
+  if(!asgLines.length){ toast('Es war kein Text zu finden.'); return; }
+  openModal('Zeilen zuordnen', assignHTML(),
+    ['<button class="btn primary" id="asgOk">Übernehmen</button>',
+     '<button class="btn ghost" id="asgBack">Zurück</button>'],
+    m => bindAssign(m, backTo));
+}
+function assignHTML(){
+  const n = r => asgLines.filter(l=>l.role===r).length;
+  return '<div class="asg-head">'+
+      '<p class="hint" style="margin:0">Tipp auf T, Z oder S, um eine Zeile zum '+
+        'Titel, zu einer Zutat oder zu einem Schritt zu machen. Alles mit „–“ wird '+
+        'nicht übernommen. Mit „ab hier“ setzt du alles Folgende auf einmal.</p>'+
+      '<div class="asg-sum"><b>'+n('t')+'</b> Titel · <b>'+n('z')+'</b> Zutaten · '+
+        '<b>'+n('s')+'</b> Schritte · '+n('x')+' übersprungen</div></div>'+
+    asgLines.map((l,k)=>
+      '<div class="asg-row '+l.role+'">'+
+        '<span class="asg-roles">'+
+          ['t','z','s','x'].map(r=>'<button data-set="'+k+'|'+r+'" class="'+
+            (l.role===r?'on':'')+'">'+(r==='x'?'–':r.toUpperCase())+'</button>').join('')+
+        '</span>'+
+        '<span class="asg-txt">'+esc(l.text)+'</span>'+
+        '<span class="asg-from"><button data-from="'+k+'|z">ab hier Zutaten</button>'+
+          '<button data-from="'+k+'|s">ab hier Schritte</button></span>'+
+      '</div>').join('');
+}
+function bindAssign(m, backTo){
+  const redraw = () => { m.querySelector('.modal-body').innerHTML = assignHTML();
+    bindAssign(m, backTo); };
+  m.querySelector('.modal-body').onclick = e => {
+    const set = e.target.closest('[data-set]');
+    if(set){ const p = set.dataset.set.split('|');
+      asgLines[+p[0]].role = p[1]; redraw(); return; }
+    const from = e.target.closest('[data-from]');
+    if(from){ const p = from.dataset.from.split('|');
+      for(let i=+p[0]; i<asgLines.length; i++) asgLines[i].role = p[1];
+      redraw(); }
+  };
+  m.querySelector('#asgBack').onclick = () => { closeModal(); if(backTo) backTo(); };
+  m.querySelector('#asgOk').onclick = () => {
+    const r = assignToRecipe(asgLines);
+    if(!r.title && !r.ingredients[0].n && !r.steps[0]){
+      toast('Bitte mindestens eine Zutat oder einen Schritt zuordnen.'); return; }
+    closeModal(); editRecipe(null, r);
+  };
+}
+/* Aus den zugeordneten Zeilen ein Rezept bauen */
+function assignToRecipe(lines){
+  const out = blankRecipe(); out.ingredients = []; out.steps = [];
+  let step = [];
+  const flush = () => { if(step.length){ out.steps.push(joinLines(step)); step = []; } };
+  for(const l of lines){
+    if(l.role === 't'){ if(!out.title) out.title = l.text; continue; }
+    if(l.role === 'z'){ flush(); out.ingredients.push(parseIngredient(l.text)); continue; }
+    if(l.role === 's'){
+      /* Nummer am Zeilenanfang heißt: neuer Schritt. Sonst gehört die Zeile zum
+         vorherigen – PDFs brechen Sätze mitten im Satz um. */
+      if(/^\d{1,2}\s+\S/.test(l.text)) flush();
+      /* Zeitangaben aus der Randspalte kleben am Zeilenende */
+      step.push(l.text.replace(/^\d{1,2}\s+/,'')
+                      .replace(/\s+(\d{1,3}|MIN|Min\.?|STD)$/,'').trim());
+      continue;
+    }
+    flush();
+  }
+  flush();
+  /* Zeitangaben aus Randspalten wegputzen */
+  out.steps = out.steps.map(t=>tidy(t.replace(/\s*\b\d{1,3}\s+MIN\b/gi,''))).filter(Boolean);
+  out.title = tidy(out.title);
+  out.ingredients.forEach(i=>{ i.n = tidy(i.n); });
+  if(!out.ingredients.length) out.ingredients = [{a:null,u:'g',n:''}];
+  if(!out.steps.length) out.steps = [''];
+  return out;
+}
+/* PDFs setzen Ligaturen als eigenes Zeichen und oft mit Abstand davor:
+   aus „Thun ﬁsch“ wird wieder „Thunfisch“. */
+function tidy(t){
+  return String(t||'')
+    .replace(/[\u0000-\u001f]/g,'')
+    .replace(/([A-Za-zÄÖÜäöüß]{2})\s*(ﬁ|ﬂ|ﬀ|ﬃ|ﬄ)\s*([A-Za-zÄÖÜäöüß])/g,
+      (m,a,lig,b)=> a + ({'ﬁ':'fi','ﬂ':'fl','ﬀ':'ff','ﬃ':'ffi','ﬄ':'ffl'})[lig] + b)
+    .replace(/ﬁ/g,'fi').replace(/ﬂ/g,'fl').replace(/ﬀ/g,'ff')
+    .replace(/\s+/g,' ').trim();
+}
+function parseIngredient(line){
+  const t = line.trim();
+  const m = /^(\d+[.,]?\d*|[½¼¾]|etwas|n\.\s?B\.)\s*(.*)$/i.exec(t);
+  if(!m) return { a:null, u:'n. B.', n:t };
+  let a = null, u = 'Stück', rest = m[2] || '';
+  const head = m[1];
+  if(/^etwas$/i.test(head) || /^n\./i.test(head)) u = 'n. B.';
+  else a = head==='½'?.5 : head==='¼'?.25 : head==='¾'?.75
+         : parseFloat(head.replace(',','.'));
+  const w = rest.split(' ');
+  const first = (w[0]||'').replace(/\.$/,'');
+  const PL = { zehe:'Zehe', zehen:'Zehe', scheibe:'Scheibe', scheiben:'Scheibe',
+    sch:'Scheibe', bl:'Blatt', pck:'Päckchen', tl:'TL', el:'EL',
+    blatt:'Blatt', 'blätter':'Blatt', bund:'Bund', 'bünde':'Bund', glas:'Glas',
+    'gläser':'Glas', becher:'Becher', prise:'Prise', prisen:'Prise', dose:'Dose',
+    dosen:'Dose', stange:'Stange', stangen:'Stange', zweig:'Zweig', zweige:'Zweig',
+    'päckchen':'Päckchen' };
+  const known = UNITS.find(x=>x.u.toLowerCase() === first.toLowerCase());
+  if(a !== null && known){ u = known.u; rest = w.slice(1).join(' '); }
+  else if(a !== null && PL[first.toLowerCase()]){ u = PL[first.toLowerCase()];
+    rest = w.slice(1).join(' '); }
+  return { a:a, u:u, n:rest.trim() || t };
+}
+
+/* =========================================================================
+   Austauschformat — der zuverlässigste Weg ins Buch
+   Ein Rezept in dieser festen Form wird ohne Zuordnungsschritt übernommen.
+   Der passende Prompt für den Claude-Chat steht unten in PROMPT_TEXT.
+   ========================================================================= */
+const EX_UNITS = ['g','kg','ml','l','EL','TL','Msp.','Prise','Stück','Bund','Zehe',
+  'Scheibe','Dose','Glas','Becher','Blatt','Kopf','Stange','Zweig','Päckchen','n. B.'];
+
+const PROMPT_TEXT =
+`Lies das Rezept im angehängten Bild oder PDF und gib es exakt in der unten
+stehenden Form zurück. Keine Einleitung, kein Kommentar, nichts weglassen.
+
+Regeln:
+- Übernimm die Mengen so, wie sie im Rezept stehen. Rechne nichts um.
+- Schreib in die Zeile "Ergibt", wofür die Mengen reichen — etwa "4 Portionen",
+  "6 Stück", "1 Brot", "1 Bowl".
+- Nur metrische Einheiten, und nur diese Bezeichnungen:
+  ${EX_UNITS.join(', ')}
+- Zutaten: eine pro Zeile, Menge und Einheit vor dem senkrechten Strich,
+  Name dahinter. Ohne feste Menge schreibst du "n. B." (nach Belieben).
+- Zusatzangaben wie "abgetropft" oder "fein gehackt" hängst du in Klammern
+  an den Namen.
+- Zubereitung: ein Arbeitsschritt pro Zeile, durchnummeriert. Fasse zu
+  kleinteilige Schritte zusammen, aber erfinde nichts dazu.
+- Kapitel ist genau eines von: Vorspeise, Hauptspeise, Nachspeise, Snack,
+  Getränk, Gewürz.
+- Höchstens 3 Tags, zum Beispiel Land, Ernährungsform, Eigenschaft.
+- Nährwerte je Portion schätzen, wenn sie nicht dabeistehen.
+
+Form (genau so, mit den Überschriften in Großbuchstaben):
+
+REZEPT
+Titel: <Name des Gerichts>
+Kapitel: <Vorspeise|Hauptspeise|Nachspeise|Snack|Getränk|Gewürz>
+Tags: <Tag, Tag, Tag>
+Ergibt: <Zahl> <Portionen|Stück|Bowls|Wraps|Brot|Gläser>
+Vorbereitung: <z. B. 20 Min>
+Kochen: <z. B. 30 Min — oder Backen/Braten/Garen/Kühlen/Ziehen>
+Schwierigkeit: <Leicht|Mittel|Anspruchsvoll>
+
+ZUTATEN
+500 g | Hähnchenbrustfilet
+2 Zehe | Knoblauch (fein gehackt)
+n. B. | Salz
+
+ZUBEREITUNG
+1. Erster Arbeitsschritt.
+2. Zweiter Arbeitsschritt.
+
+TIPP: <ein Satz, oder weglassen>
+NÄHRWERTE: <kcal> kcal | <x> g Eiweiß | <x> g Fett | <x> g Kohlenhydrate`;
+
+const FRAC_IN = { '½':.5, '¼':.25, '¾':.75, '⅓':1/3, '⅔':2/3, '⅛':.125 };
+function parseAmount(t){
+  t = String(t||'').trim();
+  if(!t || /^n\.\s?B\.$/i.test(t)) return { a:null, u:'n. B.' };
+  const m = /^([\d.,/]+|[½¼¾⅓⅔⅛])\s*(.*)$/.exec(t);
+  if(!m) return { a:null, u:'n. B.' };
+  let a;
+  if(FRAC_IN[m[1]] !== undefined) a = FRAC_IN[m[1]];
+  else if(m[1].indexOf('/') > 0){ const q = m[1].split('/'); a = (+q[0])/(+q[1]); }
+  else a = parseFloat(m[1].replace(',','.'));
+  const rest = (m[2]||'').trim();
+  const hit = UNITS.find(x=>x.u.toLowerCase() === rest.toLowerCase()) ||
+              UNITS.find(x=>x.u.toLowerCase() === rest.toLowerCase().replace(/n$/,''));
+  return { a: isNaN(a) ? null : a, u: hit ? hit.u : (rest || 'Stück') };
+}
+function parseExchange(txt){
+  /* Chat-Antworten kommen oft mit Fettschrift, Aufzählungspunkten oder in
+     einem Code-Block. Das stört das Format nicht. */
+  const L = String(txt||'').split('\n').map(x=>
+    x.replace(/\s+$/,'')
+     .replace(/^\s*```.*$/,'')
+     .replace(/^\s*[-*•]\s+/,'')
+     .replace(/\*\*/g,'')
+     .replace(/^\s*#+\s*/,''));
+  if(!L.some(l=>/^\s*REZEPT\s*$/i.test(l)) || !L.some(l=>/^\s*ZUTATEN\s*$/i.test(l)))
+    return null;
+  const out = blankRecipe(); out.ingredients = []; out.steps = [];
+  let mode = 'kopf';
+  const CH = {}; CHAPTERS.forEach(c=> CH[c.one.toLowerCase()] = c.id);
+  for(let raw of L){
+    const l = raw.trim();
+    if(!l) continue;
+    if(/^REZEPT$/i.test(l)){ mode = 'kopf'; continue; }
+    if(/^ZUTATEN$/i.test(l)){ mode = 'zutaten'; continue; }
+    if(/^ZUBEREITUNG$/i.test(l)){ mode = 'schritte'; continue; }
+    if(/^TIPP\s*:/i.test(l)){ out.tip = l.replace(/^TIPP\s*:\s*/i,''); continue; }
+    if(/^N(Ä|AE)HRWERTE\s*:/i.test(l)){
+      const v = {}, teile = l.replace(/^[^:]*:\s*/,'').split('|');
+      teile.forEach(t=>{
+        const n = parseFloat(String(t).replace(',','.'));
+        if(isNaN(n)) return;
+        if(/kcal/i.test(t)) v.kcal = n;
+        else if(/eiwei/i.test(t)) v.protein = n;
+        else if(/fett/i.test(t)) v.fat = n;
+        else if(/kohlenhydrat/i.test(t)) v.carbs = n;
+      });
+      if(v.kcal) out.nutriManual = { kcal:v.kcal, protein:v.protein||0,
+                                     fat:v.fat||0, carbs:v.carbs||0 };
+      continue;
+    }
+    if(mode === 'kopf'){
+      const kv = /^([A-Za-zÄÖÜäöü ]+)\s*:\s*(.*)$/.exec(l);
+      if(!kv) continue;
+      const k = kv[1].trim().toLowerCase(), v = kv[2].trim();
+      if(k === 'titel') out.title = v;
+      else if(k === 'kapitel') out.chapter = CH[v.toLowerCase()] || 'hauptspeise';
+      else if(k === 'tags') out.tags = v.split(',').map(x=>x.trim())
+        .filter(Boolean).slice(0, MAX_TAGS);
+      else if(k === 'vorbereitung') out.prep = v;
+      else if(k === 'ergibt'){
+        const g = /^\s*([\d.,]+)\s*(.*)$/.exec(v);
+        if(g){ out.servings = Math.max(1, parseFloat(g[1].replace(',','.'))||4);
+               if(g[2].trim()) out.servingsLabel = g[2].trim(); }
+      }
+      else if(k === 'schwierigkeit') out.difficulty = v;
+      else if(['kochen','backen','braten','garen','kühlen','ziehen'].indexOf(k) >= 0){
+        out.cookLabel = kv[1].trim()[0].toUpperCase() + kv[1].trim().slice(1).toLowerCase();
+        out.cook = v;
+      }
+      continue;
+    }
+    if(mode === 'zutaten'){
+      const parts = l.split('|');
+      if(parts.length < 2){ out.ingredients.push(parseIngredient(l)); continue; }
+      const men = parseAmount(parts[0]);
+      out.ingredients.push({ a:men.a, u:men.u, n:parts.slice(1).join('|').trim() });
+      continue;
+    }
+    if(mode === 'schritte'){
+      const t = l.replace(/^\d{1,2}[.)]\s*/,'').trim();
+      if(t) out.steps.push(t);
+    }
+  }
+  if(!out.title) return null;
+  if(!out.ingredients.length) out.ingredients = [{a:null,u:'g',n:''}];
+  if(!out.steps.length) out.steps = [''];
+  return out;
+}
+
+/* --------------------- Import aus Text, PDF oder Foto ------------------- */
+function importDialog(){
+  openModal('Rezept übernehmen',
+    '<div class="card pad" style="background:#fbfaf8;margin-bottom:18px">'+
+      '<div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;'+
+        'color:var(--ink-faint);margin-bottom:8px">Der zuverlässigste Weg</div>'+
+      '<p class="hint" style="margin:0 0 12px">Foto oder PDF des Rezepts in den '+
+        'Claude-Chat laden, den Prompt danebensetzen, die Antwort hier einfügen. '+
+        'Dann übernimmt die App alles ohne Nachfragen – Mengen, Einheiten, '+
+        'Portionsangabe und Nährwerte sind dabei.</p>'+
+      '<button class="btn" id="iPrompt">Prompt kopieren</button></div>'+
+    '<p class="hint" style="margin-bottom:16px">Es geht auch direkt: PDF laden, '+
+      'abtippen oder einfügen. Dann zeigt die App im nächsten Schritt, was sie '+
+      'gelesen hat, und du ordnest die Zeilen zu.</p>'+
+    '<label class="field"><span>PDF-Datei</span>'+
+      '<input type="file" id="iPdf" accept="application/pdf,.pdf"></label>'+
+    '<div id="pdfState"></div>'+
+    '<label class="field"><span>Foto als Vorlage (optional)</span>'+
+      '<input type="file" id="iPhoto" accept="image/*"></label>'+
+    '<div id="photoBox"></div>'+
+    '<label class="field"><span>Rezepttext</span>'+
+      '<textarea id="iText" rows="12" placeholder="Kaiserschmarrn&#10;&#10;'+
+      '4 Eier&#10;200 g Mehl&#10;250 ml Milch&#10;1 Prise Salz&#10;&#10;'+
+      'Eier trennen und das Eiweiß steif schlagen.&#10;'+
+      'Mehl und Milch zu einem glatten Teig rühren."></textarea></label>'+
+    '<p class="hint">Erste Zeile wird zum Titel. Zeilen, die mit einer Zahl beginnen, '+
+      'liest die App als Zutat, längere Sätze als Arbeitsschritt.</p>',
+    ['<button class="btn primary" id="iGo">Weiter zum Zuordnen</button>',
+     '<button class="btn ghost" id="iCancel">Abbrechen</button>'],
+    m => {
+      m.querySelector('#iCancel').onclick = closeModal;
+      m.querySelector('#iPrompt').onclick = () => copyText(PROMPT_TEXT,
+        'Prompt kopiert – im Claude-Chat einfügen und Foto dazulegen.',
+        m.querySelector('#iText'));
+      m.querySelector('#iPdf').onchange = async e => {
+        const f = e.target.files[0]; if(!f) return;
+        const st = m.querySelector('#pdfState');
+        st.innerHTML = '<p class="hint" style="margin:-8px 0 14px">PDF wird gelesen …</p>';
+        try{
+          const txt = await pdfToText(await f.arrayBuffer());
+          if(!txt || txt.replace(/\s/g,'').length < 40){
+            st.innerHTML = '<div class="warn" style="margin:-4px 0 14px">In diesem PDF '+
+              'steckt kein auslesbarer Text. Vermutlich ist es eine eingescannte Seite, '+
+              'also ein Bild. Leg es unten als Foto daneben und tipp den Text ab.</div>';
+            return;
+          }
+          m.querySelector('#iText').value = txt;
+          st.innerHTML = '<p class="hint" style="margin:-8px 0 14px">Text übernommen ('+
+            txt.split('\n').filter(Boolean).length+' Zeilen). Bitte unten durchsehen – '+
+            'PDFs bringen oft Kopfzeilen und Seitenzahlen mit, die hier nicht '+
+            'hineingehören.</p>';
+        }catch(err){
+          st.innerHTML = '<div class="warn" style="margin:-4px 0 14px">Die Datei konnte '+
+            'nicht gelesen werden. Kopier den Text notfalls direkt aus dem PDF-Programm '+
+            'hier hinein.</div>';
+        }
+      };
+      m.querySelector('#iPhoto').onchange = e => {
+        const f = e.target.files[0]; if(!f) return;
+        const url = URL.createObjectURL(f);
+        m.querySelector('#photoBox').innerHTML =
+          '<img src="'+url+'" style="max-width:100%;border-radius:10px;'+
+          'border:1px solid var(--rule);margin-bottom:14px">'+
+          '<p class="hint" style="margin:-8px 0 14px">Foto liegt als Vorlage bereit – '+
+          'tipp den Text daneben ab.</p>';
+      };
+      m.querySelector('#iGo').onclick = () => {
+        const txt = m.querySelector('#iText').value;
+        if(!txt.trim()){ toast('Bitte erst einen Text einfügen oder ein PDF laden.'); return; }
+        /* Ein PDF aus dieser App lässt sich exakt zurücklesen – dann direkt weiter */
+        const ex = parseExchange(txt);
+        if(ex){ closeModal(); toast('Austauschformat erkannt – direkt übernommen.');
+          editRecipe(null, ex); return; }
+        const own = parseOwnExport(txt);
+        closeModal();
+        if(own && own.title && own.ingredients.length > 1){
+          toast('Eigenes Buchformat erkannt – direkt übernommen.');
+          editRecipe(null, own);
+        } else openAssign(txt, importDialog);
+      };
+    });
+}
+/* Gesperrte Großbuchstaben aus dem PDF wieder zusammenziehen:
+   „V O R S P E I S E“ -> „VORSPEISE“ */
+function unspace(l){
+  const t = l.split(' ');
+  return (t.length >= 4 && t.filter(x=>x.length===1).length >= t.length*0.8)
+    ? t.join('') : l;
+}
+/* Ein PDF, das diese App selbst erzeugt hat, lässt sich exakt zurücklesen –
+   so kann man ein Rezept einfach als PDF verschicken. */
+/* Zeilenumbrüche aus dem PDF zusammenfügen – nach Trennstrich ohne Leerzeichen */
+function joinLines(buf){
+  return buf.reduce((acc,l)=> !acc ? l : (/[–-]$/.test(acc) ? acc+l : acc+' '+l), '');
+}
+function parseOwnExport(txt){
+  const L = txt.split('\n').map(x=>tidy(unspace(x.trim()))).filter(Boolean);
+  if(!L.some(l => /^PRO PORTION/.test(l))) return null;   /* nicht unser Format */
+
+  const KINDS = {}; CHAPTERS.forEach(c=> KINDS[c.one.toUpperCase()] = c.id);
+  const out = blankRecipe(); out.ingredients = []; out.steps = [];
+  const steps = {};                     /* nach Schrittnummer, die Spalten laufen
+                                           in der Leserichtung durcheinander */
+  let curStep = null, expect = 1, tipBuf = null;
+
+  for(let i=0;i<L.length;i++){
+    const l = L[i];
+
+    if(KINDS[l] !== undefined && out.title) break;   /* nächstes Rezept beginnt */
+    if(KINDS[l] !== undefined && !out.title){
+      out.chapter = KINDS[l];
+      out.title = L[i+1] || '';
+      if(L[i+2] && L[i+2].indexOf('·') >= 0)
+        out.tags = L[i+2].split('·').map(t=>t.trim())
+          .filter(Boolean).map(t=>t[0]+t.slice(1).toLowerCase()).slice(0, MAX_TAGS);
+      i += 2; curStep = null; continue;
+    }
+    if(/^VORBEREITUNG/.test(l)){
+      const labels = l.split(/\s+/), vals = L[i+1] || '';
+      const times = vals.match(/\d+\s*(?:Min|Std|Stunden)/gi) || [];
+      const port = /(\d+)\s*$/.exec(vals);
+      if(port) out.servings = Math.max(1, +port[1]);
+      if(labels[labels.length-1]) out.servingsLabel =
+        labels[labels.length-1][0] + labels[labels.length-1].slice(1).toLowerCase();
+      out.prep = times[0] || '';
+      out.cook = times[1] || '';
+      if(labels[1]) out.cookLabel = labels[1][0] + labels[1].slice(1).toLowerCase();
+      const d = /(Leicht|Mittel|Anspruchsvoll)/.exec(vals);
+      if(d) out.difficulty = d[1];
+      i++; curStep = null; continue;
+    }
+    if(/^(ZUTATEN|ZUBEREITUNG|PRO PORTION|NOTIZEN|BEREITS GEKOCHT)/.test(l)){
+      curStep = null; continue; }
+    const nut = /^(KCAL|EIWEISS|FETT|KOHLENHYDRATE)\s+([\d.,]+)/.exec(l);
+    if(nut){
+      out.nutriManual = out.nutriManual || {kcal:0,protein:0,fat:0,carbs:0};
+      const v = parseFloat(nut[2].replace(',','.'));
+      ({KCAL:'kcal', EIWEISS:'protein', FETT:'fat', KOHLENHYDRATE:'carbs'})[nut[1]]
+        && (out.nutriManual[({KCAL:'kcal',EIWEISS:'protein',FETT:'fat',
+             KOHLENHYDRATE:'carbs'})[nut[1]]] = v);
+      curStep = null; continue;
+    }
+    if(/^Tipp:/.test(l)){ tipBuf = [l.replace(/^Tipp:\s*/,'')]; curStep = 'tip'; continue; }
+    if(curStep === 'tip'){
+      if(tipBuf) tipBuf.push(l);
+      if(/[.!?]$/.test(l)) curStep = null;
+      continue;
+    }
+    /* Ein Arbeitsschritt beginnt mit der nächsten erwarteten Nummer und ist lang.
+       „2 Knoblauchzehen“ ist deshalb eine Zutat, „2 Basilikum in Streifen …“ nicht. */
+    const st = /^(\d{1,2})\s+(.+)$/.exec(l);
+    if(st && +st[1] === expect && st[2].length >= 20){
+      curStep = +st[1]; steps[curStep] = [st[2]]; expect++; continue;
+    }
+    if(/^([\d.,½¼¾]+|n\.\s?B\.)\s/.test(l) && l.length < 60 && curStep === null){
+      out.ingredients.push(parseIngredient(l)); continue;
+    }
+    /* Eindeutige Zutatenzeilen gehören nie zu einem Schritt, auch wenn sie im
+       Text hinter einem stehen – die Spalten laufen ineinander. */
+    const sicher = /^n\.\s?B\.\s/i.test(l) ||
+      /^([\d.,½¼¾]+)\s+(g|kg|ml|l|EL|TL|Msp\.|Prise|St(ü|ue)ck|Bund|Zehen?|Scheiben?|Sch\.|Dosen?|Glas|Becher|Bl(att|\.)|Kopf|Stangen?|Zweige?|Päckchen)\b/i.test(l);
+    if(sicher && l.length < 60){ out.ingredients.push(parseIngredient(l)); continue; }
+    if(curStep !== null && steps[curStep]){ steps[curStep].push(l); continue; }
+    if(/^([\d.,½¼¾]+|n\.\s?B\.)\s/.test(l) && l.length < 60){
+      out.ingredients.push(parseIngredient(l)); continue;
+    }
+  }
+  out.steps = Object.keys(steps).map(Number).sort((a,b)=>a-b)
+    .map(k=>joinLines(steps[k]));
+  if(tipBuf) out.tip = joinLines(tipBuf);
+  if(!out.ingredients.length) out.ingredients = [{a:null,u:'g',n:''}];
+  if(!out.steps.length) out.steps = [''];
+  return out;
+}
+
+/* Einfacher Zeilen-Parser: erkennt Mengen, Einheiten und Fließtext-Schritte */
+function parseRecipeText(txt){
+  const own = parseOwnExport(String(txt||''));
+  if(own && own.title && own.ingredients.length > 1) return own;
+  const lines = String(txt||'').split(/\r?\n/).map(s=>s.trim());
+  if(!lines.some(Boolean)) return null;
+  const out = blankRecipe(); out.ingredients=[]; out.steps=[];
+  const unitRe = new RegExp('^('+UNITS.map(u=>u.u.replace('.','\\.')).join('|')+
+    '|Dosen|Zehen|Scheiben|Bünde|Blätter|Stk)\\b','i');
+  let titleSet = false;
+  for(const line of lines){
+    if(!line) continue;
+    if(!titleSet && !/^[\d½¼¾]/.test(line) && line.length<60){ out.title=line; titleSet=true; continue; }
+    const m = line.match(/^([\d]+[.,]?\d*|½|¼|¾)\s*(.*)$/);
+    if(m && m[2].length < 70){
+      let a = m[1]==='½'?.5 : m[1]==='¼'?.25 : m[1]==='¾'?.75 : parseFloat(m[1].replace(',','.'));
+      let rest = m[2], u = 'Stück';
+      const um = rest.match(unitRe);
+      if(um){
+        u = ({dosen:'Dose',zehen:'Zehe',scheiben:'Scheibe','bünde':'Bund',
+              'blätter':'Blatt',stk:'Stück'})[um[1].toLowerCase()] ||
+             (UNITS.find(x=>x.u.toLowerCase()===um[1].toLowerCase())||{}).u || 'Stück';
+        rest = rest.slice(um[1].length).trim();
+      } else if(/^g\b|^kg\b|^ml\b|^l\b/i.test(rest)){
+        u = rest.match(/^\w+/)[0]; rest = rest.replace(/^\w+\s*/,'');
+      }
+      out.ingredients.push({a:a, u:u, n:rest.replace(/^,\s*/,'')});
+      continue;
+    }
+    if(line.length > 25) out.steps.push(line);
+    else if(!out.steps.length) out.ingredients.push({a:null,u:'n. B.',n:line});
+    else out.steps.push(line);
+  }
+  if(!out.ingredients.length) out.ingredients=[{a:null,u:'g',n:''}];
+  if(!out.steps.length) out.steps=[''];
+  return out;
+}
+
+/* =========================================================================
+   TEIL 6 — Wochenplan
+   ========================================================================= */
+function viewPlan(){
+  const active = MEALS.filter(m=>S.settings.meals.includes(m.id));
+  const opts = r => '<option value="">–</option>'+ CHAPTERS.map(c=>
+    '<optgroup label="'+esc(c.many)+'">'+ S.recipes.filter(x=>x.chapter===c.id)
+      .map(x=>'<option value="'+x.id+'" '+(r===x.id?'selected':'')+'>'+esc(x.title)+
+      '</option>').join('') +'</optgroup>').join('');
+  $('#view').innerHTML =
+    '<h2 class="section">Wochenplan</h2>'+
+    '<div class="sub">Wähl aus, welche Mahlzeiten du planen willst. Die Personenzahl '+
+      'gilt pro Tag – die Einkaufsliste rechnet die Mengen entsprechend um.</div>'+
+    '<div class="card pad" style="margin-bottom:20px"><div class="row">'+
+      '<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;'+
+      'color:var(--ink-faint)">Mahlzeiten</span>'+
+      MEALS.map(m=>'<button class="chip '+(S.settings.meals.includes(m.id)?'on':'')+
+        '" data-m="'+m.id+'">'+m.label+'</button>').join('')+
+      '<span class="spacer"></span><button class="btn sm" id="clearPlan">Woche leeren</button>'+
+    '</div></div>'+
+    '<div class="plan">'+ DAYS.map((d,i)=>{
+      const pers = S.plan.persons[i] || 4;
+      return '<div class="day"><h4>'+d+'</h4>'+
+        '<div class="pers">für <input type="number" min="1" max="20" value="'+pers+
+          '" data-pd="'+i+'"> Personen</div>'+
+        active.map(m=>{
+          const rid = (S.plan.entries[i]||{})[m.id]||'';
+          return '<div class="slot"><div class="sl">'+m.label+'</div>'+
+            '<select data-day="'+i+'" data-meal="'+m.id+'">'+opts(rid)+'</select>'+
+            (rid ? '<button class="btn sm" style="margin-top:6px;width:100%" '+
+              'data-cookid="'+rid+'">Kochen</button>' : '')+'</div>';
+        }).join('')+
+      '</div>'; }).join('') +'</div>'+
+    '<div class="row" style="margin-top:22px">'+
+      '<button class="btn primary" id="toShop">Einkaufsliste erstellen</button></div>';
+
+  $('#view').onchange = e => {
+    const s = e.target.closest('select[data-day]');
+    if(s){ const d=s.dataset.day; S.plan.entries[d] = S.plan.entries[d]||{};
+      if(s.value) S.plan.entries[d][s.dataset.meal] = s.value;
+      else delete S.plan.entries[d][s.dataset.meal];
+      save(); return; }
+    const p = e.target.closest('input[data-pd]');
+    if(p){ S.plan.persons[p.dataset.pd] = Math.max(1, +p.value||4); save(); }
+  };
+  $('#view').onclick = e => {
+    const b = e.target.closest('[data-m]');
+    if(b){ const id=b.dataset.m;
+      S.settings.meals = S.settings.meals.includes(id)
+        ? S.settings.meals.filter(x=>x!==id) : S.settings.meals.concat([id]);
+      if(!S.settings.meals.length) S.settings.meals=[id];
+      save(); viewPlan(); return; }
+    const ck = e.target.closest('[data-cookid]');
+    if(ck){ startCooking(ck.dataset.cookid); return; }
+    if(e.target.id==='clearPlan'){ S.plan={persons:{},entries:{}}; save(); viewPlan(); return; }
+    if(e.target.id==='toShop'){ route='shop'; render(); }
+  };
+}
+
+/* =========================================================================
+   TEIL 7 — Vorratssuche: was lässt sich aus dem kochen, was da ist?
+   ========================================================================= */
+let pantrySel = [];          /* gewählte Zutaten */
+let pantryChapter = '';      /* gewünschte Mahlzeit */
+let pantryStaples = true;    /* Grundvorrat als vorhanden annehmen */
+
+function knownIngredients(){
+  const set = {};
+  S.recipes.forEach(r => (r.ingredients||[]).forEach(i=>{
+    if(i.n) set[canonical(i.n)] = set[canonical(i.n)] || i.n;
+  }));
+  return Object.keys(set).sort().map(k=>set[k]);
+}
+/* Wie gut passt ein Rezept zu dem, was da ist? */
+function matchRecipe(r, want){
+  const need = [], used = [], missing = [];
+  (r.ingredients||[]).forEach(i=>{
+    if(!i.n) return;
+    const k = canonical(i.n);
+    if(pantryStaples && isStaple(k)) return;      /* Salz und Öl sind immer da */
+    need.push(k);
+    if(want.includes(k)) used.push(i.n); else missing.push(i.n);
+  });
+  return { used, missing, need,
+           share: need.length ? used.length/need.length : 0 };
+}
+function viewIdeas(){
+  const want = pantrySel.map(canonical);
+  const known = knownIngredients();
+  let hits = [];
+  if(want.length){
+    hits = S.recipes
+      .filter(r => !pantryChapter || r.chapter===pantryChapter)
+      .map(r => Object.assign({r:r}, matchRecipe(r, want)))
+      .filter(h => h.used.length > 0)
+      .sort((a,b)=> b.used.length - a.used.length ||
+                    a.missing.length - b.missing.length ||
+                    b.share - a.share);
+  }
+  $('#view').innerHTML =
+    '<h2 class="section">Was koche ich?</h2>'+
+    '<div class="sub">Trag ein, was weg muss. Die App sucht Rezepte, die möglichst '+
+      'viel davon verwenden, und sagt dir, was noch fehlt.</div>'+
+    '<div class="pantry-box">'+
+      '<div class="pantry-in">'+
+        '<input type="text" id="pIn" list="ingList" placeholder="Zutat eingeben, z. B. Paprika">'+
+        '<datalist id="ingList">'+known.map(n=>'<option value="'+esc(n)+'">').join('')+
+        '</datalist>'+
+        '<button class="btn" id="pAdd">Hinzufügen</button>'+
+      '</div>'+
+      (pantrySel.length ? '<div class="pantry-chips">'+pantrySel.map((n,k)=>
+        '<button class="chip" data-rm="'+k+'">'+esc(n)+'<b>×</b></button>').join('')+
+        '<button class="btn ghost sm" id="pClear">alle entfernen</button></div>' : '')+
+      '<div class="row" style="margin-top:16px">'+
+        '<span style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;'+
+        'color:var(--ink-faint)">Mahlzeit</span>'+
+        '<button class="chip '+(!pantryChapter?'on':'')+'" data-pc="">Egal</button>'+
+        CHAPTERS.map(c=>'<button class="chip '+(pantryChapter===c.id?'on':'')+
+          '" data-pc="'+c.id+'">'+esc(c.many)+'</button>').join('')+
+      '</div>'+
+      '<div class="opt" style="margin-top:6px"><input type="checkbox" id="pStap" '+
+        (pantryStaples?'checked':'')+'><div><label for="pStap">Grundvorrat vorhanden</label>'+
+        '<div class="d">Salz, Pfeffer, Öl, Essig, Mehl, Zucker und Gewürze zählen '+
+        'nicht als fehlend.</div></div></div>'+
+    '</div>'+
+    (!pantrySel.length
+      ? '<div class="empty"><p>Noch keine Zutat eingetragen.</p>'+
+        '<p style="font-size:13px">Tipp: Fang mit dem an, was am ehesten schlecht wird.</p></div>'
+      : (hits.length ? hits.map(hitHTML).join('')
+        : '<div class="empty"><p>Kein Rezept im Buch verwendet diese Zutaten.</p>'+
+          '<p style="font-size:13px">Je mehr Rezepte im Buch stehen, desto besser '+
+          'werden die Vorschläge.</p></div>'));
+
+  const add = () => {
+    const v = $('#pIn').value.trim();
+    if(!v) return;
+    if(!pantrySel.some(x=>canonical(x)===canonical(v))) pantrySel.push(v);
+    $('#pIn').value=''; viewIdeas(); $('#pIn').focus();
+  };
+  $('#pAdd').onclick = add;
+  $('#pIn').onkeydown = e => { if(e.key==='Enter'){ e.preventDefault(); add(); } };
+  $('#pStap').onchange = e => { pantryStaples = e.target.checked; viewIdeas(); };
+  $('#view').onclick = e => {
+    const rm = e.target.closest('[data-rm]');
+    if(rm){ pantrySel.splice(+rm.dataset.rm,1); viewIdeas(); return; }
+    if(e.target.id==='pClear'){ pantrySel=[]; viewIdeas(); return; }
+    const pc = e.target.closest('[data-pc]');
+    if(pc){ pantryChapter = pc.dataset.pc; viewIdeas(); return; }
+    const b = e.target.closest('[data-act]');
+    if(!b) return;
+    const r = S.recipes.find(x=>x.id===b.dataset.id);
+    if(!r) return;
+    if(b.dataset.act==='show')  showRecipe(r.id);
+    if(b.dataset.act==='cook')  startCooking(r.id);
+    if(b.dataset.act==='shop'){ addMissingToList(r, pantrySel.map(canonical)); }
+  };
+}
+function hitHTML(h){
+  const r = h.r, pct = Math.round(h.share*100);
+  const miss = h.missing;
+  return '<div class="hit">'+
+    '<span class="ic">'+icon(r.chapter,'26px','')+'</span>'+
+    '<div class="mid"><h3>'+esc(r.title)+'</h3>'+
+      '<div class="sc">nutzt '+h.used.length+' deiner Zutaten · '+
+        esc(chapterOf(r.chapter).one)+'</div>'+
+      '<div class="bar"><i style="width:'+pct+'%"></i></div>'+
+      (miss.length
+        ? '<div class="miss">fehlt noch: <b>'+esc(miss.slice(0,4).join(', '))+
+          (miss.length>4 ? ' und '+(miss.length-4)+' weitere' : '')+'</b></div>'
+        : '<div class="miss">Du hast alles da.</div>')+
+      '<div class="acts">'+
+        '<button class="btn sm primary" data-act="cook" data-id="'+r.id+'">Kochen</button>'+
+        '<button class="btn sm" data-act="show" data-id="'+r.id+'">Ansehen</button>'+
+        (miss.length ? '<button class="btn sm" data-act="shop" data-id="'+r.id+
+          '">Fehlendes auf die Einkaufsliste</button>' : '')+
+      '</div></div></div>';
+}
+function addMissingToList(r, want){
+  const m = matchRecipe(r, want);
+  let n = 0;
+  (r.ingredients||[]).forEach(i=>{
+    if(!m.missing.includes(i.n)) return;
+    const key = canonical(i.n);
+    if(S.shopExtra.some(x=>canonical(x.name)===key)) return;
+    S.shopExtra.push({ name:i.n, qty:amountText(i,1), dept:deptOf(i.n),
+                       from:r.title });
+    n++;
+  });
+  save();
+  toast(n ? n+' Zutaten auf die Einkaufsliste gelegt.' : 'Stand schon auf der Liste.');
+}
+
+/* =========================================================================
+   TEIL 7b — Einkaufsliste
+   ========================================================================= */
+function buildShopping(){
+  const items = {};
+  DAYS.forEach((d,i)=>{
+    const day = S.plan.entries[i]; if(!day) return;
+    const factor0 = (S.plan.persons[i]||4);
+    Object.values(day).forEach(rid=>{
+      const r = S.recipes.find(x=>x.id===rid); if(!r) return;
+      const factor = factor0 / yieldOf(r);
+      (r.ingredients||[]).forEach(ing=>{
+        if(!ing.n) return;
+        const key = canonical(ing.n)+'|'+ing.u;
+        if(!items[key]) items[key] = { name:ing.n, names:{}, unit:ing.u, amount:0,
+                                       any:false, dept:deptOf(ing.n), from:new Set(),
+                                       key:canonical(ing.n) };
+        const it = items[key];
+        it.names[ing.n] = (it.names[ing.n]||0) + 1;
+        if(ing.a==null || ing.u==='n. B.') it.any = true;
+        else it.amount += ing.a*factor;
+        it.from.add(r.title);
+      });
+    });
+  });
+  const list = Object.values(items).map(it=>{
+    it.name = Object.keys(it.names).sort((a,b)=>
+      (it.names[b]-it.names[a]) || (a.length-b.length))[0] || it.name;
+    let qty;
+    if(it.amount===0 && it.any) qty = 'n. B.';
+    else if(it.unit==='g' && it.amount>=1000) qty = num(it.amount/1000)+' kg';
+    else if(it.unit==='ml' && it.amount>=1000) qty = num(it.amount/1000)+' l';
+    else qty = num(it.amount) +
+      (it.unit==='Stück' ? '' : ' '+unitLabel(it.unit, it.amount));
+    return { name:it.name, key:it.key, qty:qty.trim(), dept:it.dept,
+             from:Array.from(it.from) };
+  });
+  /* von Hand ergänzte Posten */
+  (S.shopExtra||[]).forEach(x=> list.push({ name:x.name, key:canonical(x.name),
+    qty:x.qty||'', dept:x.dept||'son', from:x.from?[x.from]:['Von Hand ergänzt'],
+    extra:true }));
+  return list;
+}
+function groupShopping(items, mode){
+  if(mode==='alpha')
+    return [{label:'Alle Zutaten von A bis Z',
+             items:items.slice().sort((a,b)=>a.name.localeCompare(b.name,'de'))}];
+  if(mode==='recipe'){
+    const by = {};
+    items.forEach(it=> it.from.forEach(t=>{ (by[t]=by[t]||[]).push(it); }));
+    return Object.keys(by).sort((a,b)=>a.localeCompare(b,'de'))
+      .map(t=>({label:t, items:by[t]}));
+  }
+  return DEPTS.map(d=>({label:d[1], items:items.filter(i=>i.dept===d[0])
+    .sort((a,b)=>a.name.localeCompare(b.name,'de'))})).filter(g=>g.items.length);
+}
+let doneOpen = false;
+function viewShop(){
+  const all = buildShopping();
+  const mode = S.settings.shopSort;
+  const open = all.filter(i=>!S.shopDone[i.key]);
+  const done = all.filter(i=> S.shopDone[i.key]);
+  const groups = groupShopping(open, mode);
+  const modes = [['dept','Nach Supermarkt-Abteilung'],['recipe','Nach Rezept'],
+                 ['alpha','Alphabetisch']];
+  const line = (it, isDone) =>
+    '<div class="shop-item'+(isDone?' done':'')+'"><label>'+
+      '<input type="checkbox" data-k="'+esc(it.key)+'" '+(isDone?'checked':'')+'>'+
+      '<span class="q">'+esc(it.qty)+'</span>'+
+      '<span class="n">'+esc(it.name)+
+        (mode!=='recipe' && !isDone
+          ? ' <span class="from">· '+esc(it.from.join(', '))+'</span>' : '')+
+      '</span></label></div>';
+
+  $('#view').innerHTML =
+    '<h2 class="section">Einkaufsliste</h2>'+
+    '<div class="sub">Entsteht aus dem Wochenplan. Gleiche Zutaten werden '+
+      'zusammengezählt – auch wenn sie in den Rezepten unterschiedlich heißen.</div>'+
+    '<div class="card pad" style="margin-bottom:22px"><div class="row">'+
+      '<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;'+
+      'color:var(--ink-faint)">Sortierung</span>'+
+      modes.map(m=>'<button class="chip '+(mode===m[0]?'on':'')+'" data-s="'+m[0]+'">'+
+        m[1]+'</button>').join('')+
+      '<span class="spacer"></span>'+
+      '<button class="btn sm" id="shopAdd">+ Eigener Posten</button>'+
+      '<button class="btn sm" id="shopPrint">Drucken</button>'+
+      '<button class="btn sm" id="shopCopy">Kopieren</button>'+
+      '<button class="btn sm ghost" id="shopReset">Neue Liste starten</button>'+
+    '</div></div>'+
+    (all.length
+      ? (open.length
+          ? groups.map(g=>'<div class="shop-group"><h4>'+esc(g.label)+'</h4>'+
+              g.items.map(it=>line(it,false)).join('')+'</div>').join('')
+          : '<div class="empty"><p>Alles eingekauft.</p></div>')+
+        (done.length
+          ? '<div class="shop-done-head" id="doneHead">'+
+              (doneOpen?'▾':'▸')+' Schon da ('+done.length+')</div>'+
+            (doneOpen ? '<div class="shop-group">'+
+              done.map(it=>line(it,true)).join('')+'</div>' : '')
+          : '')
+      : '<div class="empty"><p>Der Wochenplan ist noch leer.</p>'+
+        '<button class="btn primary" id="goPlan">Zum Wochenplan</button></div>');
+
+  $('#view').onclick = e => {
+    const s2 = e.target.closest('[data-s]');
+    if(s2){ S.settings.shopSort = s2.dataset.s; save(); viewShop(); return; }
+    if(e.target.id==='goPlan'){ route='plan'; render(); return; }
+    if(e.target.closest('#doneHead')){ doneOpen = !doneOpen; viewShop(); return; }
+    if(e.target.id==='shopAdd'){ addExtraDialog(); return; }
+    if(e.target.id==='shopReset'){
+      if(!confirm('Haken entfernen und eigene Posten löschen?')) return;
+      S.shopDone={}; S.shopExtra=[]; save(); viewShop(); return; }
+    if(e.target.id==='shopPrint'){
+      printShopping(groupShopping(open, mode)); return; }
+    if(e.target.id==='shopCopy'){
+      const txt = groups.map(g=>g.label+'\n'+
+        g.items.map(i=>'- '+i.qty+' '+i.name).join('\n')).join('\n\n');
+      copyText(txt, 'Einkaufsliste kopiert.');
+    }
+  };
+  $('#view').onchange = e => { const c = e.target.closest('[data-k]'); if(!c) return;
+    if(c.checked) S.shopDone[c.dataset.k]=1; else delete S.shopDone[c.dataset.k];
+    save(); viewShop(); };
+}
+function addExtraDialog(){
+  openModal('Eigener Posten',
+    '<div class="row" style="gap:12px">'+
+      '<label class="field" style="width:110px"><span>Menge</span>'+
+        '<input type="text" id="xQty" placeholder="2 Stück"></label>'+
+      '<label class="field" style="flex:1;min-width:160px"><span>Was</span>'+
+        '<input type="text" id="xName" placeholder="Küchenrolle"></label></div>'+
+    '<label class="field"><span>Abteilung</span><select id="xDept">'+
+      DEPTS.map(d=>'<option value="'+d[0]+'">'+d[1]+'</option>').join('')+
+    '</select></label>',
+    ['<button class="btn primary" id="xOk">Auf die Liste</button>',
+     '<button class="btn ghost" id="xNo">Abbrechen</button>'],
+    m => {
+      m.querySelector('#xNo').onclick = closeModal;
+      m.querySelector('#xOk').onclick = () => {
+        const n = m.querySelector('#xName').value.trim();
+        if(!n){ toast('Bitte etwas eintragen.'); return; }
+        S.shopExtra.push({ name:n, qty:m.querySelector('#xQty').value.trim(),
+          dept:m.querySelector('#xDept').value, from:'Von Hand ergänzt' });
+        save(); closeModal(); viewShop();
+      };
+    }, true);
+}
+function printShopping(groups){
+  const when = new Date().toLocaleDateString('de-DE',
+    {weekday:'long', day:'numeric', month:'long'});
+  const fmt = S.settings.printFormat;
+  $('#pageStyle').textContent = '@page{size:'+(fmt==='a4'?'210mm 297mm':'148mm 210mm')+
+    ';margin:0}';
+  $('#printRoot').innerHTML = paper(sheetList(groups, 'Einkaufsliste', when));
+  setTimeout(()=>window.print(), 60);
+}
+
+/* =========================================================================
+   TEIL 8 — Drucken und Export
+   ========================================================================= */
+function viewPrint(){
+  const s = S.settings;
+  const cb = (id,l,d,on) => '<div class="opt"><input type="checkbox" id="'+id+'" '+
+    (on?'checked':'')+'><div><label for="'+id+'">'+l+'</label>'+
+    '<div class="d">'+d+'</div></div></div>';
+  $('#view').innerHTML =
+    '<h2 class="section">Drucken &amp; Export</h2>'+
+    '<div class="sub">Rezept vorne, Notizen hinten – deshalb beidseitig drucken. '+
+      'Leere Seiten entstehen nur dort, wo sie im Ordner auch hingehören.</div>'+
+    '<div class="card pad" style="margin-bottom:18px">'+
+      '<div class="row" style="margin-bottom:16px">'+
+        '<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;'+
+        'color:var(--ink-faint)">Papierformat</span>'+
+        '<button class="chip '+(s.printFormat==='a4'?'on':'')+'" data-f="a4">A4</button>'+
+        '<button class="chip '+(s.printFormat==='a5'?'on':'')+'" data-f="a5">A5</button>'+
+        '<span class="hint" style="margin:0">'+(s.printFormat==='a4'
+          ? 'Große, gut lesbare Schrift. Jeder Heimdrucker kann A4 beidseitig.'
+          : 'Kompaktes Kochbuchformat. Braucht einen Drucker, der A5 beidseitig kann.')+
+        '</span></div>'+
+      '<label class="field"><span>Umfang</span><select id="pScope">'+
+        '<option value="all">Ganzes Rezeptbuch ('+S.recipes.length+' Rezepte)</option>'+
+        CHAPTERS.map(c=>{ const n=S.recipes.filter(r=>r.chapter===c.id).length;
+          return '<option value="ch:'+c.id+'">Nur '+esc(c.many)+' ('+n+')</option>'; }).join('')+
+        '<option value="selection">Nur ausgewählte ('+selection.size+')</option>'+
+        '<option value="dividers">Nur die Trennblätter (einseitig)</option>'+
+      '</select></label>'+
+      cb('pCover','Titelseite','Nur beim ganzen Buch, vorne im Ordner.', s.printCover)+
+      cb('pNotes','Notizseite hinter jedem Rezept','Mit „Bereits gekocht“ und Notizfeld. '+
+        'Ausgeschaltet druckt die App einseitig, ganz ohne leere Seiten.', s.printNotes)+
+      cb('pMargin','Lochrand','Innenrand abwechselnd breiter, damit beim Lochen nichts wegfällt.',
+        s.printMargin)+
+      '<div class="row" style="margin-top:16px">'+
+        '<button class="btn primary" id="pGo">Druckansicht öffnen</button>'+
+        '<button class="btn" id="pPreview">Vorschau anzeigen</button>'+
+        '<span class="spacer"></span>'+
+        '<button class="btn ghost sm" id="pHintReset">Druckanleitung wieder zeigen</button>'+
+      '</div>'+
+      '<p class="hint">Trennblätter druckst du einmalig separat – sie sind Registerkarten '+
+        'und werden nur vorne bedruckt.</p>'+
+    '</div>'+
+    '<div class="card pad">'+
+      '<div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;'+
+        'color:var(--ink-faint);margin-bottom:10px">Sicherung &amp; Weitergabe</div>'+
+      '<div class="row"><button class="btn" id="bkExp">Als Datei sichern</button>'+
+      '<button class="btn" id="bkImp">Datei einspielen</button>'+
+      '<button class="btn" id="bkText">Über Text kopieren / einfügen</button>'+
+      '<input type="file" id="bkFile" accept="application/json,.json" style="display:none"></div>'+
+      '<p class="hint">Die Rezepte liegen auf diesem Gerät. Über ein Backup kommen sie '+
+        'aufs Handy, aufs Tablet oder zu Familie und Freunden. Auf iPhone und iPad, wo '+
+        'Downloads manchmal blockiert sind, funktioniert der Weg über Text zuverlässig.</p></div>'+
+    '<div id="pvBox" style="margin-top:22px"></div>';
+
+  const readOpts = () => {
+    s.printCover = $('#pCover').checked;
+    s.printNotes = $('#pNotes').checked; s.printMargin = $('#pMargin').checked; save();
+  };
+  $('#view').addEventListener('click', e => {
+    const f = e.target.closest('[data-f]');
+    if(f){ s.printFormat = f.dataset.f; save(); viewPrint(); }
+  });
+  $('#pGo').onclick = () => { readOpts(); doPrint($('#pScope').value); };
+  $('#pPreview').onclick = () => { readOpts();
+    const pages = buildPages($('#pScope').value);
+    const pv = s.printFormat==='a4' ? 'pv-a4' : 'pv-a5';
+    $('#pvBox').innerHTML = '<div class="preview">'+
+      pages.map(h=>'<div class="pv-scale '+pv+'">'+paper(h)+'</div>').join('')+'</div>';
+    fitSheets($('#pvBox')); };
+  $('#pHintReset').onclick = () => { S.settings.hintSeen=false; save();
+    toast('Die Druckanleitung erscheint wieder vor dem nächsten Druck.'); };
+  $('#bkExp').onclick = exportBackup;
+  $('#bkImp').onclick = () => $('#bkFile').click();
+  $('#bkFile').onchange = importBackup;
+  $('#bkText').onclick = backupText;
+}
+
+/* Backup über die Zwischenablage — funktioniert auch dort, wo Downloads blockiert sind */
+function backupText(){
+  openModal('Backup über Text',
+    '<p class="hint" style="margin:0 0 12px">Zum Sichern: Text markieren und kopieren. '+
+      'Zum Übernehmen: fremdes Backup hier hineinsetzen und auf Einspielen tippen – '+
+      'die App fragt dann, ob sie ergänzen oder ersetzen soll.</p>'+
+    '<textarea id="bkArea" rows="10" spellcheck="false" '+
+      'style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px">'+
+      esc(JSON.stringify(backupPayload()))+'</textarea>',
+    ['<button class="btn primary" id="bkCopy">Kopieren</button>',
+     '<button class="btn" id="bkPut">Einspielen</button>',
+     '<button class="btn ghost" id="bkClose">Schließen</button>'],
+    m => {
+      m.querySelector('#bkClose').onclick = closeModal;
+      m.querySelector('#bkCopy').onclick = () => {
+        const a = m.querySelector('#bkArea');
+        copyText(a.value, 'Backup kopiert.', a);
+      };
+      m.querySelector('#bkPut').onclick = () => {
+        try{
+          const p = JSON.parse(m.querySelector('#bkArea').value);
+          if(!p.recipes) throw 0;
+          closeModal(); importChoice(p);
+        }catch(e){ toast('Der Text ist kein gültiges Backup.'); }
+      };
+    });
+}
+/* Vor dem Einspielen zeigen, was passiert: Was kommt neu dazu, was ist schon
+   da? Erst danach entscheidet man zwischen Ergänzen und Ersetzen. */
+function importChoice(payload){
+  const liste = (payload && Array.isArray(payload.recipes))
+    ? payload.recipes.map(normalizeRecipe) : [];
+  if(!liste.length){ toast('In der Datei stehen keine Rezepte.'); return; }
+  const vorhanden = {};
+  S.recipes.forEach(r=> vorhanden[norm(r.title)] = true);
+  const neu = [], dopp = [], gesehen = {};
+  liste.forEach(r=>{
+    const k = norm(r.title);
+    if(vorhanden[k] || gesehen[k]) dopp.push(r.title); else { neu.push(r.title); gesehen[k]=true; }
+  });
+  const wann = payload.exportedAt ? new Date(payload.exportedAt).toLocaleDateString('de-DE') : '';
+  const liste1 = (titel, klasse, ueberschrift) => !titel.length ? '' :
+    '<div class="imp-box '+klasse+'"><h4>'+ueberschrift+' ('+titel.length+')</h4><ul>'+
+      titel.slice(0,10).map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>'+
+      (titel.length>10 ? '<div class="mehr">und '+(titel.length-10)+' weitere</div>' : '')+
+    '</div>';
+
+  openModal('Backup einspielen',
+    '<p class="imp-meta">'+liste.length+' Rezepte in der Sicherung'+
+      (wann ? ' vom '+wann : '')+'. Dein Buch enthält gerade '+S.recipes.length+'.</p>'+
+    liste1(neu, 'neu', 'Kommt neu dazu')+
+    liste1(dopp, 'dop', 'Schon vorhanden – wird beim Zusammenführen übersprungen')+
+    '<p class="hint" style="margin-top:14px"><b>Zusammenführen</b> ergänzt nur die '+
+      'neuen Rezepte. Deine eigenen Fassungen gleichnamiger Rezepte bleiben, wie sie '+
+      'sind – ebenso Wochenplan, Einkaufsliste und Einstellungen.<br>'+
+      '<b>Alles ersetzen</b> überschreibt dein Buch vollständig, samt Wochenplan, '+
+      'Einkaufsliste und Einstellungen aus der Sicherung.</p>',
+    [(neu.length
+        ? '<button class="btn primary" id="impMerge">'+neu.length+' hinzufügen</button>'
+        : '<button class="btn" disabled>Nichts Neues dabei</button>'),
+     '<button class="btn danger" id="impRepl">Alles ersetzen</button>',
+     '<button class="btn ghost" id="impNo">Abbrechen</button>'],
+    m => {
+      m.querySelector('#impNo').onclick = closeModal;
+      if(m.querySelector('#impMerge')) m.querySelector('#impMerge').onclick = () => {
+        const n = mergeRecipes(liste);
+        closeModal();
+        toast(n+' Rezepte hinzugefügt'+(dopp.length ? ', '+dopp.length+' übersprungen.' : '.'));
+      };
+      m.querySelector('#impRepl').onclick = () => {
+        if(!confirm('Dein Buch mit '+S.recipes.length+' Rezepten wird vollständig '+
+          'durch die Sicherung ersetzt. Fortfahren?')) return;
+        applyBackup(payload); closeModal();
+      };
+    });
+}
+
+/* Rezepte ergänzen, ohne das eigene Buch zu verlieren. Gleiche Titel bleiben,
+   wie sie sind – niemand will seine Anpassungen überschrieben bekommen. */
+function mergeRecipes(liste){
+  const da = {};
+  S.recipes.forEach(r=> da[norm(r.title)] = true);
+  let n = 0;
+  (liste||[]).forEach(r=>{
+    if(!r || !r.title || da[norm(r.title)]) return;
+    const kopie = normalizeRecipe(JSON.parse(JSON.stringify(r)));
+    kopie.id = uid(); kopie.createdAt = Date.now();
+    S.recipes.push(kopie); da[norm(r.title)] = true; n++;
+  });
+  if(n){ save(); render(); }
+  return n;
+}
+function applyBackup(p){
+  S = normalizeState(p);
+  save(); render(); toast('Backup eingespielt.');
+}
+
+/* Ein Blatt Papier: die A5-Buchseite wird für A4 mittig vergrößert */
+const paper = sheet => '<div class="paper '+S.settings.printFormat+'">'+sheet+'</div>';
+
+/* Seitenfolge. Rezept vorne, Notizen hinten – daher immer paarweise, damit
+   beim beidseitigen Druck nichts verrutscht. Leerseiten nur, wo physisch nötig. */
+function buildPages(scope, oneId){
+  const s = S.settings, pages = [], notes = s.printNotes;
+  let list = S.recipes.slice();
+  if(scope==='selection') list = list.filter(r=>selection.has(r.id));
+  else if(oneId) list = list.filter(r=>r.id===oneId);
+  else if(String(scope).startsWith('ch:')) list = list.filter(r=>r.chapter===scope.slice(3));
+
+  /* Trennblätter sind Registerkarten und werden einseitig gedruckt */
+  if(scope==='dividers') return CHAPTERS.map((c,i)=>sheetDivider(c,i));
+
+  if(s.printCover && scope==='all'){
+    pages.push(sheetCover());
+    if(notes) pages.push(sheetBlank());   /* Rückseite des Titels bleibt frei */
+  }
+  CHAPTERS.forEach(c=>{
+    list.filter(r=>r.chapter===c.id).forEach(r=>{
+      pages.push(sheetRecipe(r, 1, yieldOf(r)));
+      if(notes) pages.push(sheetNotes(r));
+    });
+  });
+  return pages;
+}
+
+/* Anleitung vor dem Druck — die Browser-Voreinstellungen ruinieren sonst das Layout */
+function printHint(then){
+  if(S.settings.hintSeen){ then(); return; }
+  const f = S.settings.printFormat==='a4' ? 'A4' : 'A5';
+  openModal('Kurz vor dem Drucken',
+    '<p class="hint" style="margin:0 0 14px">Im Druckfenster des Browsers bitte diese '+
+      'vier Einstellungen prüfen. Vor allem die Kopf- und Fußzeilen – sonst druckt der '+
+      'Browser Datum und Adresse auf jede Seite, auch auf die Notizseiten.</p>'+
+    '<div class="card pad" style="background:#fbfaf8">'+
+      [['Papierformat', f],
+       ['Ränder', 'Keine'],
+       ['Kopf- und Fußzeilen', 'ausschalten'],
+       ['Beidseitig', 'lange Kante / Buchbindung']]
+      .map(x=>'<div class="opt" style="padding:6px 0"><div style="flex:1">'+
+        '<label>'+x[0]+'</label><div class="d">'+x[1]+'</div></div></div>').join('')+
+    '</div>'+
+    '<div class="opt" style="margin-top:12px"><input type="checkbox" id="hSeen">'+
+      '<label for="hSeen">Diesen Hinweis nicht mehr anzeigen</label></div>',
+    ['<button class="btn primary" id="hGo">Weiter zum Drucken</button>',
+     '<button class="btn ghost" id="hNo">Abbrechen</button>'],
+    m => {
+      m.querySelector('#hNo').onclick = closeModal;
+      m.querySelector('#hGo').onclick = () => {
+        if(m.querySelector('#hSeen').checked){ S.settings.hintSeen = true; save(); }
+        closeModal(); then();
+      };
+    }, true);
+}
+
+function doPrint(scope, oneId){
+  const pages = buildPages(scope==='one' ? 'one' : scope, oneId);
+  if(!pages.length){ toast('Dafür gibt es noch keine Rezepte.'); return; }
+  printHint(()=>{
+    const fmt = S.settings.printFormat;
+    $('#pageStyle').textContent = '@page{size:'+(fmt==='a4'?'210mm 297mm':'148mm 210mm')+
+      ';margin:0}';
+    const root = $('#printRoot');
+    root.innerHTML = pages.map(paper).join('');
+    if(!S.settings.printMargin)
+      root.querySelectorAll('.sheet').forEach(x=>x.style.padding='11mm 14mm 12mm');
+    root.style.display='block';
+    fitSheets(root);
+    root.style.display='';
+    setTimeout(()=>window.print(), 80);
+  });
+}
+
+function backupPayload(){
+  return Object.assign({ app:'rezeptbuch', version:DATA_VERSION,
+    exportedAt:new Date().toISOString() }, S);
+}
+function exportBackup(){
+  const blob = new Blob([JSON.stringify(backupPayload(),null,2)],
+    {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'rezeptbuch-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('Backup gespeichert.');
+}
+function importBackup(e){
+  const f = e.target.files[0]; if(!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try{
+      const p = JSON.parse(rd.result);
+      if(!p.recipes) throw new Error('kein Rezeptbuch');
+      importChoice(p);
+    }catch(err){ toast('Datei konnte nicht gelesen werden.'); }
+  };
+  rd.readAsText(f);
+  e.target.value = '';          /* damit dieselbe Datei erneut gewählt werden kann */
+}
+
+/* Wo steht dieselbe Zutat unter verschiedenen Namen? */
+function dupGroups(){
+  const by = {};
+  S.recipes.forEach(r => (r.ingredients||[]).forEach(i=>{
+    if(!i.n) return;
+    const k = canonical(i.n);
+    (by[k] = by[k] || {})[i.n] = (by[k][i.n]||0) + 1;
+  }));
+  return Object.keys(by).map(k=>({ key:k, variants:Object.keys(by[k]), counts:by[k] }))
+    .filter(g => g.variants.length > 1)
+    .sort((a,b)=> b.variants.length - a.variants.length);
+}
+function dupDialog(){
+  const groups = dupGroups();
+  openModal('Schreibweisen angleichen',
+    '<p class="hint" style="margin:0 0 16px">Wähl je Zeile die Schreibweise, die '+
+      'überall stehen soll. Was du nicht auswählst, bleibt wie es ist.</p>'+
+    groups.map((g,k)=>
+      '<label class="field"><span>'+esc(g.variants.join('  ·  '))+'</span>'+
+      '<select data-g="'+k+'"><option value="">— unverändert lassen —</option>'+
+      g.variants.map(v=>'<option value="'+esc(v)+'">'+esc(v)+' ('+g.counts[v]+'×)</option>')
+        .join('')+'</select></label>').join(''),
+    ['<button class="btn primary" id="duOk">Anwenden</button>',
+     '<button class="btn ghost" id="duNo">Abbrechen</button>'],
+    m => {
+      m.querySelector('#duNo').onclick = closeModal;
+      m.querySelector('#duOk').onclick = () => {
+        let n = 0;
+        m.querySelectorAll('[data-g]').forEach(sel=>{
+          const pick = sel.value; if(!pick) return;
+          const g = groups[+sel.dataset.g];
+          S.recipes.forEach(r => (r.ingredients||[]).forEach(i=>{
+            if(i.n && canonical(i.n) === g.key && i.n !== pick){ i.n = pick; n++; }
+          }));
+        });
+        save(); closeModal(); render();
+        toast(n ? n+' Zutaten angeglichen.' : 'Nichts geändert.');
+      };
+    });
+}
+
+/* =========================================================================
+   TEIL 9 — Einstellungen
+   ========================================================================= */
+function viewSettings(){
+  $('#view').innerHTML =
+    '<h2 class="section">Einstellungen</h2>'+
+    '<div class="sub">Titel und Untertitel erscheinen auf der Titelseite des Buches.</div>'+
+    '<div class="card pad" style="max-width:520px">'+
+      '<label class="field"><span>Titel des Buches</span>'+
+        '<input type="text" id="sT" value="'+esc(S.settings.title)+'"></label>'+
+      '<label class="field"><span>Untertitel</span>'+
+        '<input type="text" id="sS" value="'+esc(S.settings.subtitle)+'"></label>'+
+      '<button class="btn primary" id="sSave">Speichern</button>'+
+    '</div>'+
+    '<div class="card pad" style="max-width:520px;margin-top:18px">'+
+      '<div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;'+
+        'color:var(--ink-faint);margin-bottom:10px">Zutaten aufräumen</div>'+
+      (dupGroups().length
+        ? '<p class="hint" style="margin:0 0 12px">'+dupGroups().length+
+          ' Zutaten stehen in verschiedenen Schreibweisen im Buch. Für die '+
+          'Einkaufsliste ist das egal – auf den Rezeptseiten sieht es sauberer aus, '+
+          'wenn du dich für eine Variante entscheidest.</p>'+
+          '<button class="btn" id="sDup">Schreibweisen angleichen</button>'
+        : '<p class="hint" style="margin:0">Alle Zutaten sind einheitlich '+
+          'geschrieben.</p>')+
+    '</div>'+
+    '<div class="card pad" style="max-width:520px;margin-top:18px">'+
+      '<div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;'+
+        'color:var(--ink-faint);margin-bottom:10px">Nährwerte</div>'+
+      '<p class="hint" style="margin:0">Die Schätzung stützt sich auf eine Tabelle mit '+
+        FOODS.length+' Zutaten. Sie liefert Richtwerte für die Portionsplanung, keine '+
+        'exakte Analyse. Bei jedem Rezept lassen sich die Werte von Hand überschreiben.</p>'+
+    '</div>';
+  if($('#sDup')) $('#sDup').onclick = dupDialog;
+  $('#sSave').onclick = () => {
+    S.settings.title = $('#sT').value.trim() || 'Unser Rezeptbuch';
+    S.settings.subtitle = $('#sS').value.trim();
+    save(); render(); toast('Gespeichert.');
+  };
+}
+
+/* Zugriff von außen (Browser-Konsole, automatische Tests) */
+window.APP = {
+  get state(){ return S; },       set state(v){ S = v; },
+  get filter(){ return filter; }, set filter(v){ filter = v; },
+  get route(){ return route; },   set route(v){ route = v; },
+  get selection(){ return selection; },
+  save, render, nutriOf, estimate, findFood, grams, deptOf, num,
+  buildShopping, groupShopping, buildPages, mergeRecipes, importChoice, yieldOf, normalizeRecipe, normalizeState,
+  applyBackup, backupPayload, parseRecipeText, parseOwnExport, pdfToText, fontNameMap, parseCMap, inflate, contentToText, tokenizeContent, itemsToLines, xyCut, stepMinutes, canonical,
+  stepIngredients, startCooking, endCooking, preClassify, assignToRecipe, parseIngredient, tidy, parseExchange, parseAmount,
+  openAssign
+};
+
+render();
+</script>
+</body>
+</html>
